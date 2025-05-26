@@ -25,6 +25,7 @@ const CountInternalJournalTab: FC<Props> = ({ countId }) => {
       <ProTable<InternalJournalItem>
         formRef={ref}
         actionRef={actionRef}
+        columnEmptyText={"-"}
         scroll={{ x: "auto" }}
         columns={[
           {
@@ -65,18 +66,34 @@ const CountInternalJournalTab: FC<Props> = ({ countId }) => {
           {
             title: "Тооллогчын нэр",
             search: false,
-            render: (_, record) =>
-              `${record.level1WorkerLastName.at(0)}.${
-                record.level1WorkerFirstName
-              }`,
+            render: (_, record) => {
+              if (
+                record.level1WorkerLastName == null ||
+                record.level1WorkerFirstName == null
+              ) {
+                return "-";
+              }
+
+              return `${record.level1WorkerLastName?.at(0)}.${
+                record.level1WorkerFirstName ?? ""
+              }`;
+            },
           },
           {
             title: "Баталгажуулагийн нэр",
             search: false,
-            render: (_, record) =>
-              `${record.level2WorkerLastName.at(0)}.${
-                record.level2WorkerFirstName
-              }`,
+            render: (_, record) => {
+              if (
+                record.level2WorkerLastName == null ||
+                record.level2WorkerFirstName == null
+              ) {
+                return "-";
+              }
+
+              return `${record.level2WorkerLastName?.at(0)}.${
+                record.level2WorkerFirstName ?? ""
+              }`;
+            },
           },
           {
             title: "Bin",

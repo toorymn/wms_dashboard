@@ -18,12 +18,12 @@ export interface InternalJournalItem {
   createdAt: string;
   description: string;
   unitOfMeasureCode: string;
-  level1WorkerUsername: string;
-  level1WorkerFirstName: string;
-  level1WorkerLastName: string;
-  level2WorkerUsername: string;
-  level2WorkerFirstName: string;
-  level2WorkerLastName: string;
+  level1WorkerUsername: string | null;
+  level1WorkerFirstName: string | null;
+  level1WorkerLastName: string | null;
+  level2WorkerUsername: string | null;
+  level2WorkerFirstName: string | null;
+  level2WorkerLastName: string | null;
   zone: number;
   level1Quantity: number | null;
   l2Id: number;
