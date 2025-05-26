@@ -1,34 +1,35 @@
 import { SplashScreen } from "components";
 import { MainLayout } from "layouts";
-import { lazy, Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import { Suspense } from "react";
+import { Outlet, RouteObject } from "react-router-dom";
+import WorkerAccountListPage from "pages/workers";
+import CountHomePage from "pages/count";
+import CountDetailPage from "pages/count/detail";
+import AuthGuard from "@/context/auth-guard";
 
-const HomePage = lazy(() => import("pages"));
-const AccountListPage = lazy(() => import("pages/account"));
-
-export const mainRoutes = {
+export const mainRoutes: RouteObject = {
   path: "/",
   element: (
     <Suspense fallback={<SplashScreen />}>
-      <Outlet />
+      <AuthGuard>
+        <MainLayout>
+          <Outlet />
+        </MainLayout>
+      </AuthGuard>
     </Suspense>
   ),
   children: [
     {
-      path: "",
-      element: (
-        <MainLayout>
-          <HomePage />
-        </MainLayout>
-      ),
+      path: "/",
+      element: <CountHomePage />,
     },
     {
-      path: "account",
-      element: (
-        <MainLayout>
-          <AccountListPage />
-        </MainLayout>
-      ),
+      path: "/count/:id",
+      element: <CountDetailPage />,
+    },
+    {
+      path: "/account",
+      element: <WorkerAccountListPage />,
     },
   ],
 };

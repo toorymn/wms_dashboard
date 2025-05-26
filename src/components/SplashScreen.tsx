@@ -1,6 +1,6 @@
+import { Spin } from "antd";
+
 const SplashScreen = () => {
-    return ( 
-        <div>SplashScreen</div>
-     );
-}
+  return <Spin fullscreen size="large" />;
+};
 export default SplashScreen;
