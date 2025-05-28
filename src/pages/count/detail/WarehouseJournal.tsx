@@ -18,7 +18,7 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
   });
   const ref = useRef<ProFormInstance>();
 
-  const reload = () => actionRef.current?.reload();
+  // const reload = () => actionRef.current?.reload();
 
   return (
     <>

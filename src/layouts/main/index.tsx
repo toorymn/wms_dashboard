@@ -6,8 +6,7 @@ import {
   PrinterOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
-import type { ProSettings } from "@ant-design/pro-components";
-import { ProConfigProvider, ProLayout } from "@ant-design/pro-components";
+import { ProLayout, type ProSettings } from "@ant-design/pro-components";
 import { Dropdown } from "antd";
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
