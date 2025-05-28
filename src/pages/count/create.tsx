@@ -85,7 +85,7 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
           }}
           name="id"
           tooltip="Count number"
-          rules={[{ required: true, message: "Please enter " }]}
+          rules={[{ required: true, message: "Please  enter " }]}
           required
         />
 
