@@ -11,6 +11,22 @@ export interface InternalCount {
   createdAt: string;
 }
 
+export interface WorkerZoneAssignments {
+  userName: string;
+  firstName: string;
+  id: number
+  lastName: string;
+  access_ware_houses: string[] | null;
+  zones: {
+    id: number;
+    no: number;
+    countId:number
+    level: number;
+    workerId: number;
+    status: string;
+  }[];
+}
+
 export interface InternalJournalItem {
   l1Id: number;
   itemNo: string;
@@ -30,9 +46,6 @@ export interface InternalJournalItem {
   level2Quantity: number | null;
 }
 
-
-
-
 export interface WareHouseCountJournalItem {
   id: number;
   createdAt: string;
@@ -49,15 +62,15 @@ export interface WareHouseCountJournalItem {
   description: string;
   level1Quantity: number | null;
   level2Quantity: number | null;
-  
 }
-
 
 export interface GetCountListParams extends PaginationRequest {
   status?: string;
   wareHouse?: string;
   batchName?: string;
 }
+
+export interface GetZoneAssignmentParams extends PaginationRequest {}
 
 export interface GetCountInternalJournalParams extends PaginationRequest {}
 
@@ -82,6 +95,12 @@ export interface CreateCountParams {
   showQuantity: boolean;
 }
 
+export interface UpdateAssignedZones {
+  workerId: number;
+  countZones: number[];
+  confirmZones: number[];
+}
+
 const CountService = {
   getCountList: (body: GetCountListParams) =>
     Api.post<ListResponse<InternalCount>>("/admin/count/list", {
@@ -93,17 +112,36 @@ const CountService = {
       hasAuth: true,
     }),
   getCountInternalJournal: (id: number, body: GetCountInternalJournalParams) =>
-    Api.post<ListResponse<InternalJournalItem>>(`/admin/count/${id}/internal-journal`, {
-      hasAuth: true,
-      body,
-    }),
+    Api.post<ListResponse<InternalJournalItem>>(
+      `/admin/count/${id}/internal-journal`,
+      {
+        hasAuth: true,
+        body,
+      }
+    ),
   getCountWareHouseJournal: (id: number, body: GetCountInternalJournalParams) =>
-    Api.post<ListResponse<WareHouseCountJournalItem>>(`/admin/count/${id}/warehouse-journal`, {
-      hasAuth: true,
-      body,
-    }),
+    Api.post<ListResponse<WareHouseCountJournalItem>>(
+      `/admin/count/${id}/warehouse-journal`,
+      {
+        hasAuth: true,
+        body,
+      }
+    ),
   createCount: (body: CreateCountParams) =>
     Api.post("/admin/count/create", {
+      hasAuth: true,
+      body,
+    }),
+
+  getZones: (id: number, body: GetZoneAssignmentParams) =>
+    Api.post<ListResponse<WorkerZoneAssignments>>(`/admin/count/${id}/assign-zone/list`, {
+      hasAuth: true,
+      body,
+    }),
+  assignZones: (id: number, body: UpdateAssignedZones) =>
+    Api.post<{
+      overlap?: {no: number, level:1}[]
+    }>(`/admin/count/${id}/assign-zone`, {
       hasAuth: true,
       body,
     }),

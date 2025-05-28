@@ -3,8 +3,9 @@ import CountInternalJournalTab from "./InternalJournal";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import WareHouseJournalTab from "./WarehouseJournal";
+import WareHouseZoneAssignmentTab from "./ZoneAssigment";
 
-type TabKey = "internal" | "warehouse";
+type TabKey = "internal" | "warehouse" | "zone-assignment";
 const CountDetailPage = () => {
   const { id } = useParams();
   const [tab, setTab] = useState<TabKey>("internal");
@@ -24,6 +25,10 @@ const CountDetailPage = () => {
           tab: "Дотоод тоолллого",
           key: "internal",
         },
+        {
+          tab: "Ажлын жагсаалт",
+          key: "zone-assignment",
+        },
       ]}
       onTabChange={(tab) => {
         setTab(tab as TabKey);
@@ -32,6 +37,9 @@ const CountDetailPage = () => {
     >
       {tab == "internal" && <CountInternalJournalTab countId={countId} />}
       {tab == "warehouse" && <WareHouseJournalTab countId={countId} />}
+      {tab == "zone-assignment" && (
+        <WareHouseZoneAssignmentTab countId={countId} />
+      )}
     </PageContainer>
   );
 };
