@@ -78,7 +78,10 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
             const selectedJournal = journals.data?.records.find(
               (r) => r.id === (option as { value: string }).value
             );
-            form.setFieldValue("locationCode", selectedJournal?.locationCode);
+            form.setFieldValue(
+              "wareHouseLocationCode",
+              selectedJournal?.locationCode
+            );
           }}
           name="id"
           tooltip="Count number"
@@ -89,7 +92,7 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
         <ProFormText
           width="md"
           label="Байршлын нэр"
-          name="locationCode"
+          name="wareHouseLocationCode"
           fieldProps={{ readOnly: true }}
         />
         <ProForm.Item
