@@ -32,7 +32,6 @@ export const UpdateZoneAssignment: FC<Props> = ({ onClose, data }) => {
       }}
       modalProps={{
         onCancel: () => onClose(false),
-        onClose: () => onClose(false),
         destroyOnClose: true,
       }}
       onFinish={async (values) => {
