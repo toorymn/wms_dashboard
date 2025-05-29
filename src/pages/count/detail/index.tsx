@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import WareHouseJournalTab from "./WarehouseJournal";
 import WareHouseZoneAssignmentTab from "./ZoneAssigment";
+import ZoneOverViewTab from "./ZoneOverview";
 
-type TabKey = "internal" | "warehouse" | "zone-assignment";
+type TabKey = "internal" | "warehouse" | "zone-assignment" | "zone-overview";
 const CountDetailPage = () => {
   const { id } = useParams();
   const [tab, setTab] = useState<TabKey>("internal");
@@ -29,6 +30,10 @@ const CountDetailPage = () => {
           tab: "Ажлын жагсаалт",
           key: "zone-assignment",
         },
+        {
+          tab: "Бүсийн тайлан",
+          key: "zone-overview",
+        },
       ]}
       onTabChange={(tab) => {
         setTab(tab as TabKey);
@@ -40,6 +45,7 @@ const CountDetailPage = () => {
       {tab == "zone-assignment" && (
         <WareHouseZoneAssignmentTab countId={countId} />
       )}
+      {tab == "zone-overview" && <ZoneOverViewTab countId={countId} />}
     </PageContainer>
   );
 };

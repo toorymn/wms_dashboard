@@ -14,17 +14,28 @@ export interface InternalCount {
 export interface WorkerZoneAssignments {
   userName: string;
   firstName: string;
-  id: number
+  id: number;
   lastName: string;
   access_ware_houses: string[] | null;
   zones: {
     id: number;
     no: number;
-    countId:number
+    countId: number;
     level: number;
     workerId: number;
     status: string;
   }[];
+}
+
+
+export interface ZoneAssignmentOverview {
+  zone: number;
+  level1Total: number | null;
+  level2Total: number | null;
+  level1FirstName: string | null;
+  level1LastName: string | null;
+  level2FirstName: string | null;
+  level2LastName: string | null;
 }
 
 export interface InternalJournalItem {
@@ -73,6 +84,8 @@ export interface GetCountListParams extends PaginationRequest {
 export interface GetZoneAssignmentParams extends PaginationRequest {}
 
 export interface GetCountInternalJournalParams extends PaginationRequest {}
+
+export interface GetZoneAssignmentOverviewParams extends PaginationRequest {}
 
 export interface WareHouseJournal {
   id: string;
@@ -134,14 +147,22 @@ const CountService = {
     }),
 
   getZones: (id: number, body: GetZoneAssignmentParams) =>
-    Api.post<ListResponse<WorkerZoneAssignments>>(`/admin/count/${id}/assign-zone/list`, {
+    Api.post<ListResponse<WorkerZoneAssignments>>(
+      `/admin/count/${id}/assign-zone/list`,
+      {
+        hasAuth: true,
+        body,
+      }
+    ),
+  assignZones: (id: number, body: UpdateAssignedZones) =>
+    Api.post<{
+      overlap?: { no: number; level: 1 }[];
+    }>(`/admin/count/${id}/assign-zone`, {
       hasAuth: true,
       body,
     }),
-  assignZones: (id: number, body: UpdateAssignedZones) =>
-    Api.post<{
-      overlap?: {no: number, level:1}[]
-    }>(`/admin/count/${id}/assign-zone`, {
+  zonesOverview: (id: number, body: GetZoneAssignmentOverviewParams) =>
+    Api.post<ListResponse<ZoneAssignmentOverview>>(`/admin/count/${id}/zone-overview/list`, {
       hasAuth: true,
       body,
     }),
