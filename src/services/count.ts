@@ -27,7 +27,6 @@ export interface WorkerZoneAssignments {
   }[];
 }
 
-
 export interface ZoneAssignmentOverview {
   zone: number;
   level1Total: number | null;
@@ -162,9 +161,27 @@ const CountService = {
       body,
     }),
   zonesOverview: (id: number, body: GetZoneAssignmentOverviewParams) =>
-    Api.post<ListResponse<ZoneAssignmentOverview>>(`/admin/count/${id}/zone-overview/list`, {
+    Api.post<ListResponse<ZoneAssignmentOverview>>(
+      `/admin/count/${id}/zone-overview/list`,
+      {
+        hasAuth: true,
+        body,
+      }
+    ),
+
+  submitCount: (countId: number) =>
+    Api.post(`/admin/count/submit`, {
       hasAuth: true,
-      body,
+      body: {
+        countId,
+      },
+    }),
+  cancelCount: (countId: number) =>
+    Api.post(`/admin/count/cancel`, {
+      hasAuth: true,
+      body: {
+        countId,
+      },
     }),
 };
 

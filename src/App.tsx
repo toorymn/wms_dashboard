@@ -46,6 +46,7 @@ const theme: ThemeConfig = {
       labelColor: "#281E1E",
     },
     Table: {
+      headerBg: "#fafafa",
       rowHoverBg: "#E5EAF7",
     },
   },

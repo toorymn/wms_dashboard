@@ -1,22 +1,49 @@
 import { PageContainer } from "@ant-design/pro-components";
 import CountInternalJournalTab from "./InternalJournal";
+import { ExclamationCircleOutlined, SendOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import WareHouseJournalTab from "./WarehouseJournal";
 import WareHouseZoneAssignmentTab from "./ZoneAssigment";
 import ZoneOverViewTab from "./ZoneOverview";
+import { Button, message, Modal } from "antd";
+import { useRequest } from "ahooks";
+import { CountService } from "@/services";
 
 type TabKey = "internal" | "warehouse" | "zone-assignment" | "zone-overview";
 const CountDetailPage = () => {
   const { id } = useParams();
   const [tab, setTab] = useState<TabKey>("internal");
 
+  const [modal, contextHolder] = Modal.useModal();
+
   const countId = parseInt(id!);
+
+  const cancelCount = useRequest(CountService.cancelCount, {
+    onSuccess: () => {
+      message.success("Амжилттай");
+    },
+    manual: true,
+    onError: (err) => {
+      message.error(err.message);
+    },
+  });
+
+  const submitCount = useRequest(CountService.submitCount, {
+    onSuccess: () => {
+      message.success("Амжилттай");
+    },
+    manual: true,
+    onError: (err) => {
+      message.error(err.message);
+    },
+  });
 
   return (
     <PageContainer
       title="Тооллого дэлгэрэнгүй(W-002323)"
       tabActiveKey={tab}
+      extra={[]}
       tabList={[
         {
           tab: "Нэгтгэл",
@@ -38,7 +65,43 @@ const CountDetailPage = () => {
       onTabChange={(tab) => {
         setTab(tab as TabKey);
       }}
-      extra={[]}
+      footer={[
+        <Button
+          key="cancel"
+          onClick={() => {
+            modal.confirm({
+              title: "Confirm",
+              icon: <ExclamationCircleOutlined />,
+              content: "Тооллогыг цуцлах гэж байна ",
+              okText: "Итгэлтэй байна",
+              onOk: async () => {
+                await cancelCount.runAsync(countId);
+              },
+              cancelText: "Буцах",
+            });
+          }}
+        >
+          Цуцлах
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          onClick={() => {
+            modal.confirm({
+              title: "Confirm",
+              icon: <SendOutlined />,
+              onOk: async () => {
+                await submitCount.runAsync(countId);
+              },
+              content: "Тооллогыг илгээх гэж байна итгэлтэй байна уу ",
+              okText: "Итгэлтэй байна",
+              cancelText: "Буцах",
+            });
+          }}
+        >
+          Тооллого илгээх
+        </Button>,
+      ]}
     >
       {tab == "internal" && <CountInternalJournalTab countId={countId} />}
       {tab == "warehouse" && <WareHouseJournalTab countId={countId} />}
@@ -46,6 +109,7 @@ const CountDetailPage = () => {
         <WareHouseZoneAssignmentTab countId={countId} />
       )}
       {tab == "zone-overview" && <ZoneOverViewTab countId={countId} />}
+      {contextHolder}
     </PageContainer>
   );
 };
