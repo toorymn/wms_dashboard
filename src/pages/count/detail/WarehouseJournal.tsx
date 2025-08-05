@@ -1,9 +1,15 @@
 import type { ActionType } from "@ant-design/pro-components";
 import { ProFormInstance, ProTable } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
-import { message, Tag } from "antd";
-import { FC, useRef } from "react";
+import { Flex, Input, message, Spin, Tag } from "antd";
+import { FC, useRef, useState } from "react";
 import { CountService } from "@/services";
+import {
+  CheckCircleOutlined,
+  CloseOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import { WareHouseCountJournalItem } from "@/services/count";
 
 interface Props {
@@ -12,13 +18,41 @@ interface Props {
 
 const WareHouseJournalTab: FC<Props> = ({ countId }) => {
   const actionRef = useRef<ActionType>();
+  const [editRow, setEditRow] = useState<number | null>();
+  const [editRowValue, setEditRowValue] = useState<number | null>();
   const fetch = useRequest(CountService.getCountWareHouseJournal, {
     manual: true,
     onError: (err) => message.error(err.message),
   });
+
+  const updateRow = useRequest(CountService.updateInternalJournalItem, {
+    manual: true,
+    onSuccess: () => {
+      message.success("Амжилттай хадгаллаа");
+      reload();
+    },
+    onError: (err) => message.error(err.message),
+    onFinally: () => {
+      setEditRow(null);
+      setEditRowValue(null);
+    },
+  });
   const ref = useRef<ProFormInstance>();
 
-  // const reload = () => actionRef.current?.reload();
+  const reload = () => actionRef.current?.reload();
+
+  const onSend = (record: WareHouseCountJournalItem) => {
+    if (editRowValue == null) {
+      message.error("Утга оруулна уу");
+      return;
+    }
+    updateRow.run({
+      countId: countId,
+      quantity: editRowValue,
+      itemNo: record.itemNo,
+      binCode: record.binCode,
+    });
+  };
 
   return (
     <>
@@ -71,13 +105,73 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
           {
             title: "Тоолсон тоо",
             key: "calculatedQuantity",
+            editable: () => {
+              return true;
+            },
             search: false,
             render: (_, record) => {
-              // let diff = record.level1Quantity;
-              if (record.level2Quantity != null) {
-                return record.level2Quantity;
+              let value = 0;
+              let isHasLevel3 = false;
+              if (record.level3Quantity != null) {
+                value = record.level3Quantity;
+                isHasLevel3 = true;
+              } else if (record.level2Quantity != null) {
+                value = record.level2Quantity;
+              } else if (record.level1Quantity != null) {
+                value = record.level1Quantity;
               }
-              return record.level1Quantity || 0;
+              if (editRow !== record.id) {
+                return (
+                  <Flex gap={10}>
+                    {isHasLevel3 && (
+                      <ExclamationCircleOutlined style={{ color: "orange" }} />
+                    )}
+                    {value}
+                    {!updateRow.loading && (
+                      <EditOutlined
+                        onClick={() => {
+                          setEditRowValue(value);
+                          setEditRow(record.id);
+                        }}
+                      />
+                    )}
+                  </Flex>
+                );
+              }
+
+              if (updateRow.loading) {
+                return <Spin />;
+              }
+
+              return (
+                <Input
+                  disabled={editRow !== record.id}
+                  value={editRowValue || 0}
+                  onPressEnter={() => onSend(record)}
+                  suffix={
+                    <Flex gap={10}>
+                      <CloseOutlined
+                        onClick={() => {
+                          setEditRowValue(null);
+                          setEditRow(null);
+                        }}
+                      />
+                      <CheckCircleOutlined
+                        onClick={() => {
+                          onSend(record);
+                        }}
+                      />
+                    </Flex>
+                  }
+                  onChange={(e) => {
+                    setEditRowValue(
+                      isNaN(parseInt(e.target.value))
+                        ? 0
+                        : parseInt(e.target.value)
+                    );
+                  }}
+                />
+              );
             },
           },
           {
@@ -86,8 +180,9 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
             key: "diff",
             render: (_, record) => {
               let total = 0;
-              // let diff = record.level1Quantity;
-              if (record.level2Quantity != null) {
+              if (record.level3Quantity != null) {
+                total = record.level3Quantity;
+              } else if (record.level2Quantity != null) {
                 total = record.level2Quantity;
               } else if (record.level1Quantity != null) {
                 total = record.level1Quantity;

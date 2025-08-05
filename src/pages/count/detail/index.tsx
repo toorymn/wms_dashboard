@@ -2,7 +2,7 @@ import { PageContainer } from "@ant-design/pro-components";
 import CountInternalJournalTab from "./InternalJournal";
 import { ExclamationCircleOutlined, SendOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import WareHouseJournalTab from "./WarehouseJournal";
 import WareHouseZoneAssignmentTab from "./ZoneAssigment";
 import ZoneOverViewTab from "./ZoneOverview";
@@ -14,6 +14,7 @@ type TabKey = "internal" | "warehouse" | "zone-assignment" | "zone-overview";
 const CountDetailPage = () => {
   const { id } = useParams();
   const [tab, setTab] = useState<TabKey>("internal");
+  const navigate = useNavigate();
 
   const [modal, contextHolder] = Modal.useModal();
 
@@ -22,6 +23,7 @@ const CountDetailPage = () => {
   const cancelCount = useRequest(CountService.cancelCount, {
     onSuccess: () => {
       message.success("Амжилттай");
+      navigate("/");
     },
     manual: true,
     onError: (err) => {
@@ -30,7 +32,12 @@ const CountDetailPage = () => {
   });
 
   const submitCount = useRequest(CountService.submitCount, {
-    onSuccess: () => {
+    onSuccess: (resp) => {
+      console.log(resp);
+      if (resp.errors && resp.errors.length > 0) {
+        message.error(resp.errors.map((e) => e.message).join(", "));
+        return;
+      }
       message.success("Амжилттай");
     },
     manual: true,

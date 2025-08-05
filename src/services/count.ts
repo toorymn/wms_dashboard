@@ -54,6 +54,7 @@ export interface InternalJournalItem {
   level1Quantity: number | null;
   l2Id: number;
   level2Quantity: number | null;
+  level3Quantity: number | null;
 }
 
 export interface WareHouseCountJournalItem {
@@ -72,6 +73,7 @@ export interface WareHouseCountJournalItem {
   description: string;
   level1Quantity: number | null;
   level2Quantity: number | null;
+  level3Quantity: number | null;
 }
 
 export interface GetCountListParams extends PaginationRequest {
@@ -145,6 +147,18 @@ const CountService = {
       body,
     }),
 
+  updateInternalJournalItem: (body: {
+    countId: number;
+    itemNo: string;
+    binCode: string;
+    quantity: number;
+  }) =>
+    Api.post(`/admin/count/internal-journal-final`, {
+      hasAuth: true,
+      body: {
+        ...body,
+      },
+    }),
   getZones: (id: number, body: GetZoneAssignmentParams) =>
     Api.post<ListResponse<WorkerZoneAssignments>>(
       `/admin/count/${id}/assign-zone/list`,
@@ -170,7 +184,9 @@ const CountService = {
     ),
 
   submitCount: (countId: number) =>
-    Api.post(`/admin/count/submit`, {
+    Api.post<{
+      errors: { message: string }[];
+    }>(`/admin/count/submit`, {
       hasAuth: true,
       body: {
         countId,
