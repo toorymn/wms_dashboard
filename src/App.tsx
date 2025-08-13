@@ -49,6 +49,10 @@ const theme: ThemeConfig = {
       headerBg: "#fafafa",
       rowHoverBg: "#E5EAF7",
     },
+    Tag: {
+      defaultBg: "#f0f0f0",
+      defaultColor: "rgba(0,0,0,0.85)",
+    },
   },
 };
 
