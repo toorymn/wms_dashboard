@@ -44,7 +44,7 @@ const MainLayout: React.FC<{ children?: React.ReactNode }> = (props) => {
               icon: <UserSwitchOutlined />,
             },
             {
-              path: "/product",
+              path: "/shipment",
               name: "CBM shipment",
               icon: <CodeSandboxOutlined />,
             },

@@ -6,6 +6,8 @@ import WorkerAccountListPage from "pages/workers";
 import CountHomePage from "pages/count";
 import CountDetailPage from "pages/count/detail";
 import AuthGuard from "@/context/auth-guard";
+import ShipmentsPage from "@/pages/shipment";
+import ShipmentItemsPage from "@/pages/shipment/history/detail";
 
 export const mainRoutes: RouteObject = {
   path: "/",
@@ -30,6 +32,14 @@ export const mainRoutes: RouteObject = {
     {
       path: "/account",
       element: <WorkerAccountListPage />,
+    },
+    {
+      path: "/shipment",
+      element: <ShipmentsPage />,
+    },
+    {
+      path: "/shipment/:id",
+      element: <ShipmentItemsPage />,
     },
   ],
 };

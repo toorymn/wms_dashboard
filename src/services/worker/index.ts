@@ -12,6 +12,9 @@ export interface WorkerAccount {
   updatedAt: string
   username: string
 }
+
+
+
 export interface GetWorkerListParams extends PaginationRequest {
   firstName?: string
   lastName?: string

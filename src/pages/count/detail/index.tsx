@@ -48,7 +48,7 @@ const CountDetailPage = () => {
 
   return (
     <PageContainer
-      title="Тооллого дэлгэрэнгүй(W-002323)"
+      title="Тооллого дэлгэрэнгүй"
       tabActiveKey={tab}
       extra={[]}
       tabList={[
