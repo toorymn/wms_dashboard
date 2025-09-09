@@ -18,8 +18,13 @@ export interface ShipmentOrderItem {
   name: string;
   cubage: number;
   quantity: number;
+  destination: number;
   takeBin: string;
   placeBin: string;
+}
+
+export interface PreShipmentOrderItem extends ShipmentOrderItem {
+  quantityInBox: number;
 }
 
 export interface GetShipmentItems extends PaginationRequest {
@@ -27,7 +32,18 @@ export interface GetShipmentItems extends PaginationRequest {
   name?: string;
 }
 
+export interface GetPreShipmentItems extends PaginationRequest {
+  itemNo?: string;
+  name?: string;
+}
+
 export interface GetShipmentOrders extends PaginationRequest {
+  date: Date;
+  gate?: string;
+  destinationNo?: string;
+}
+
+export interface GetPreShipmentOrders extends PaginationRequest {
   date: Date;
   gate?: string;
   destinationNo?: string;
@@ -44,6 +60,18 @@ export interface ShipmentReport {
   orders: ShipmentOrder[];
 }
 
+export interface LocationReportGate {
+  locationCode: string;
+  gates: ShipmentReport[];
+}
+export interface PreShipmentOrder {
+  id: number;
+  createdAt: string;
+  no: string;
+  gate: string;
+  cbm: number;
+}
+
 const ShipmentService = {
   shipmentOrders: (body: GetShipmentOrders) =>
     Api.post<
@@ -54,8 +82,21 @@ const ShipmentService = {
       hasAuth: true,
       body,
     }),
+  preShipmentOrders: (body: GetPreShipmentOrders) =>
+    Api.post<ListResponse<PreShipmentOrder>>("/admin/pre-shipment/list", {
+      hasAuth: true,
+      body,
+    }),
+  preShipmentOrderitems: (id: number, body: GetPreShipmentItems) =>
+    Api.post<ListResponse<PreShipmentOrderItem>>(
+      `/admin/pre-shipment/${id}/items`,
+      {
+        hasAuth: true,
+        body,
+      }
+    ),
   shipmentReport: (date: Date) =>
-    Api.post<ListResponse<ShipmentReport>>("/admin/cbm/shipment/report", {
+    Api.post<ListResponse<LocationReportGate>>("/admin/cbm/shipment/report", {
       hasAuth: true,
       body: {
         date,
@@ -68,7 +109,7 @@ const ShipmentService = {
     }),
 
   shipment: (id: number) =>
-    Api.get<ShipmentOrderItem>(`/admin/shipment/${id}`, {
+    Api.get<ShipmentOrder>(`/admin/shipment/${id}`, {
       hasAuth: true,
     }),
 };

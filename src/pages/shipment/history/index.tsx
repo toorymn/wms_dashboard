@@ -10,6 +10,8 @@ import ShipmentService, {
   ShipmentOrder,
 } from "@/services/shipment";
 import { Link } from "react-router-dom";
+import ReferenceService from "@/services/ref";
+import { cubageConverter } from "@/utils/const";
 
 const machine1 = 8; //8m3/
 const machine2 = 16; //16m3
@@ -21,6 +23,11 @@ const ShipmentHistoryPage: FC<{
 
   const fetch = useRequest(ShipmentService.shipmentOrders, {
     manual: true,
+    onError: (err) => message.error(err.message),
+  });
+
+  const warehouseFetch = useRequest(ReferenceService.warehouses, {
+    // manual: true,
     onError: (err) => message.error(err.message),
   });
 
@@ -46,13 +53,13 @@ const ShipmentHistoryPage: FC<{
                 <Row justify={"space-between"}>
                   <Statistic
                     title="Машин 1"
-                    value={(item.cbm / machine1) * 100}
+                    value={(cubageConverter(item.cbm) / machine1) * 100}
                     precision={2}
                     suffix="%"
                   />
                   <Statistic
                     title="Машин 2"
-                    value={(item.cbm / machine2) * 100}
+                    value={(cubageConverter(item.cbm) / machine2) * 100}
                     precision={0}
                     suffix="%"
                   />
@@ -85,6 +92,22 @@ const ShipmentHistoryPage: FC<{
             key: "destinationNo",
           },
           {
+            title: "Агуулах",
+            order: 10,
+            dataIndex: "locationCode",
+            key: "locationCode",
+            valueType: "select",
+            fieldProps: {
+              loading: warehouseFetch.loading,
+              showSearch: true,
+              allowClear: true,
+              options: warehouseFetch.data?.map((w) => ({
+                label: `${w.name}`,
+                value: w.code,
+              })),
+            },
+          },
+          {
             title: "Gate",
             order: 2,
             dataIndex: "gate",
@@ -107,7 +130,7 @@ const ShipmentHistoryPage: FC<{
             order: 7,
             search: false,
             render: (_, record) => {
-              return <Tag color="blue">{record.cbm}m³</Tag>;
+              return <Tag color="blue">{cubageConverter(record.cbm)}m³</Tag>;
             },
           },
           {

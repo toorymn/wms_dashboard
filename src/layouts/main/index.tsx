@@ -49,7 +49,7 @@ const MainLayout: React.FC<{ children?: React.ReactNode }> = (props) => {
               icon: <CodeSandboxOutlined />,
             },
             {
-              path: "/tables",
+              path: "/label",
               name: "Хэвлэл",
               icon: <PrinterOutlined />,
             },

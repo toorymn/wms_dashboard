@@ -1,6 +1,6 @@
 import { WorkerService } from "@/services";
+import ReferenceService from "@/services/ref";
 import { CreateWorkerParams } from "@/services/worker";
-import { WAREHOUSES } from "@/utils/const";
 import {
   DrawerForm,
   ProForm,
@@ -24,6 +24,10 @@ export const CreateWorkerAccount: FC<Props> = ({ onFinish }) => {
     onError: (err) => message.error(err.message),
   });
 
+  const warehouseFetch = useRequest(ReferenceService.warehouses, {
+    // manual: true,
+    onError: (err) => message.error(err.message),
+  });
   return (
     <DrawerForm<CreateWorkerParams>
       open
@@ -96,12 +100,10 @@ export const CreateWorkerAccount: FC<Props> = ({ onFinish }) => {
           mode="multiple"
           width={"md"}
           name="warehouse"
-          options={WAREHOUSES.map((item) => {
-            return {
-              label: item.code,
-              value: item.code,
-            };
-          })}
+          options={warehouseFetch.data?.map((w) => ({
+            label: `(${w.code})`,
+            value: w.code,
+          }))}
           label="Агуулах"
           placeholder="Please select"
           rules={[{ required: true, message: "Please select!" }]}

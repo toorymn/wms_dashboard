@@ -14,10 +14,20 @@ import {
 } from "antd";
 import { FC } from "react";
 import dayjs from "dayjs";
-import ShipmentService, { ShipmentOrder } from "@/services/shipment";
+import ShipmentService, {
+  LocationReportGate,
+  ShipmentOrder,
+} from "@/services/shipment";
+import { cubageConverter } from "@/utils/const";
 
 const machine1 = 8; //8m3/
 const machine2 = 16; //16m3
+
+const _getColor = (percentage: number) => {
+  if (percentage < 50) return "#3f8600";
+  if (percentage < 80) return "#FADB14";
+  return "#cf1322";
+};
 
 const ShipmentReportPage: FC<{
   date: dayjs.Dayjs;
@@ -34,13 +44,28 @@ const ShipmentReportPage: FC<{
     return <PageLoading />;
   }
 
-  const _getColor = (percentage: number) => {
-    if (percentage < 50) return "#3f8600";
-    if (percentage < 80) return "#FADB14";
-    return "#cf1322";
-  };
+  if (fetch.data?.records.length === 0) {
+    return <Result status="info" title="No data" />;
+  }
+  return (
+    <Flex dir={"column"} gap={"large"} style={{ width: "100%" }}>
+      {fetch.data?.records.map((warehouse) => (
+        <Card
+          key={warehouse.locationCode}
+          title={warehouse.locationCode}
+          style={{ width: "100%" }}
+        >
+          <ShipmentReportLocation warehouse={warehouse} />
+        </Card>
+      ))}
+    </Flex>
+  );
+};
 
-  const items: CollapseProps["items"] = fetch.data?.records.map((report) => ({
+const ShipmentReportLocation: FC<{ warehouse: LocationReportGate }> = ({
+  warehouse,
+}) => {
+  const items: CollapseProps["items"] = warehouse.gates.map((report) => ({
     key: report.gate,
     label: (
       <Row justify={"space-between"}>
@@ -49,7 +74,7 @@ const ShipmentReportPage: FC<{
           <Card size="small">
             <Statistic
               title="Total"
-              value={report.cbm}
+              value={cubageConverter(report.cbm)}
               precision={2}
               suffix="m³"
             />
@@ -57,9 +82,13 @@ const ShipmentReportPage: FC<{
           <Card size="small">
             <Statistic
               title="Машин 1"
-              value={(report.cbm / machine1) * 100}
+              value={(cubageConverter(report.cbm) / machine1) * 100}
               precision={2}
-              valueStyle={{ color: _getColor((report.cbm / machine1) * 100) }}
+              valueStyle={{
+                color: _getColor(
+                  (cubageConverter(report.cbm) / machine1) * 100
+                ),
+              }}
               suffix="%"
             />
           </Card>
@@ -67,9 +96,13 @@ const ShipmentReportPage: FC<{
           <Card size="small">
             <Statistic
               title="Машин 2"
-              value={(report.cbm / machine2) * 100}
+              value={(cubageConverter(report.cbm) / machine2) * 100}
               precision={2}
-              valueStyle={{ color: _getColor((report.cbm / machine2) * 100) }}
+              valueStyle={{
+                color: _getColor(
+                  (cubageConverter(report.cbm) / machine2) * 100
+                ),
+              }}
               suffix="%"
             />
           </Card>
@@ -94,6 +127,7 @@ const ShipmentReportPage: FC<{
             title: "CBM",
             dataIndex: "cbm",
             key: "cbm",
+            render: (cbm) => `${cubageConverter(cbm)} m³`,
           },
         ]}
         dataSource={report.orders}
@@ -101,8 +135,7 @@ const ShipmentReportPage: FC<{
     ),
   }));
 
-  if (items?.length == 0)
-    return <Result status="warning" title="There is not data for this date" />;
+  if (items?.length == 0) return null;
   return <Collapse items={items} />;
 };
 

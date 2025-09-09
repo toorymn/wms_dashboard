@@ -3,7 +3,7 @@ import { useState } from "react";
 import ShipmentHistoryPage from "./history";
 import ShipmentReportPage from "./report";
 import dayjs from "dayjs";
-import { DatePicker } from "antd";
+import { DatePicker, Row } from "antd";
 
 type TabKey = "history" | "report";
 
@@ -17,10 +17,12 @@ const ShipmentPage = () => {
       title="CBM shipment"
       tabActiveKey={tab}
       extra={
-        <DatePicker
-          value={reportDate}
-          onChange={(date) => setReportDate(date)}
-        />
+        <Row>
+          <DatePicker
+            value={reportDate}
+            onChange={(date) => setReportDate(date)}
+          />
+        </Row>
       }
       tabList={[
         {

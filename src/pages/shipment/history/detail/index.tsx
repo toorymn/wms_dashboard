@@ -9,7 +9,10 @@ import {
 import { useRequest } from "ahooks";
 import { Card, message } from "antd";
 import { useRef } from "react";
-import ShipmentService, { ShipmentOrderItem } from "@/services/shipment";
+import ShipmentService, {
+  ShipmentOrder,
+  ShipmentOrderItem,
+} from "@/services/shipment";
 import { useNavigate, useParams } from "react-router-dom";
 
 const ShipmentItemsPage = () => {
@@ -63,6 +66,8 @@ const ShipmentItemsPage = () => {
             {
               title: "Cbm",
               dataIndex: "cbm",
+              render: (_, record) =>
+                `${(record as ShipmentOrder).cbm ?? ""} m³`,
             },
           ]}
         />

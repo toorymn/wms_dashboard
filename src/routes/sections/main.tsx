@@ -7,7 +7,8 @@ import CountHomePage from "pages/count";
 import CountDetailPage from "pages/count/detail";
 import AuthGuard from "@/context/auth-guard";
 import ShipmentsPage from "@/pages/shipment";
-import ShipmentItemsPage from "@/pages/shipment/history/detail";
+import PreShipmentPage from "@/pages/label";
+import PreShipmentItemsPage from "@/pages/label/detail";
 
 export const mainRoutes: RouteObject = {
   path: "/",
@@ -38,8 +39,12 @@ export const mainRoutes: RouteObject = {
       element: <ShipmentsPage />,
     },
     {
-      path: "/shipment/:id",
-      element: <ShipmentItemsPage />,
+      path: "/label",
+      element: <PreShipmentPage />,
+    },
+    {
+      path: "/label/:id",
+      element: <PreShipmentItemsPage />,
     },
   ],
 };
