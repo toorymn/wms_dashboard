@@ -12,6 +12,7 @@ import { FC, useRef, useState } from "react";
 import ShipmentService, { PreShipmentOrder } from "@/services/shipment";
 import { Link } from "react-router-dom";
 import ReferenceService from "@/services/ref";
+import { cubageConverter } from "@/utils/const";
 
 const PreShipmentPage: FC = () => {
   const actionRef = useRef<ActionType>();
@@ -93,7 +94,7 @@ const PreShipmentPage: FC = () => {
               order: 7,
               search: false,
               render: (_, record) => {
-                return <Tag color="blue">{record.cbm}m³</Tag>;
+                return <Tag color="blue">{cubageConverter(record.cbm)}m³</Tag>;
               },
             },
             {

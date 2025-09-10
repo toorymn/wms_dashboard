@@ -162,6 +162,7 @@ const PreShipmentItemsPage = () => {
 
                 // Map records to CSV
                 records.forEach((record: PreShipmentOrderItem) => {
+                  const box = Math.ceil(record.quantity / record.quantityInBox);
                   const row = [
                     "",
                     record.destination,
@@ -170,9 +171,12 @@ const PreShipmentItemsPage = () => {
                     record.itemNo,
                     record.name,
                     record.quantityInBox,
-                    Math.ceil(record.quantity / record.quantityInBox),
+                    box,
                   ];
-                  csvRows.push(row.map((v) => `"${v ?? ""}"`).join(","));
+
+                  for (let i = 0; i < box; i++) {
+                    csvRows.push(row.map((v) => `"${v ?? ""}"`).join(","));
+                  }
                 });
 
                 const csvContent = "\uFEFF" + csvRows.join("\n");
