@@ -9,6 +9,7 @@ export interface BaseRecord {
 export interface BaseResponse<T> {
   message: string
   code: number
+  status: string
   result: T
 }
 

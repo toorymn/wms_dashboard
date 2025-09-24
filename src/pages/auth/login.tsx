@@ -17,6 +17,7 @@ const LoginPage = () => {
     onSuccess: (data) => {
       setUser(data.account);
       AuthService.saveToken(data.jwtToken);
+      AuthService.saveRefreshToken(data.refreshToken);
       message.success("Амжилттай нэвтэрлээ");
       navigate("/", {
         replace: true,

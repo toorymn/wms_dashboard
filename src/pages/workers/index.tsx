@@ -1,25 +1,29 @@
-import { EditFilled, PlusOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined, EditFilled, PlusOutlined } from "@ant-design/icons";
 import type { ActionType } from "@ant-design/pro-components";
 import { ProFormInstance, ProTable } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
-import { Button, Tag, Tooltip, message } from "antd";
+import { Button, Popconfirm, Tag, Tooltip, message } from "antd";
 import { useRef, useState } from "react";
-// import CreateClient from "./create";
-// import UpdateClient from "./update";
 import { WorkerService } from "@/services";
 import { WorkerAccount } from "@/services/worker";
 import CreateWorkerAccount from "./create";
+import UpdateWorkerAccount from "./update";
 
 const WorkersPage = () => {
   const actionRef = useRef<ActionType>();
   const [showCreate, setShowCreate] = useState(false);
-  const [__, setUpdate] = useState<null | WorkerAccount>(null);
+  const [update, setUpdate] = useState<null | WorkerAccount>(null);
   const fetch = useRequest(WorkerService.getWorkerList, {
     manual: true,
     onError: (err) => message.error(err.message),
   });
   const ref = useRef<ProFormInstance>();
   const reload = () => actionRef.current?.reload();
+
+  const updateStatus = useRequest(WorkerService.updateWorkerStatus, {
+    manual: true,
+    onError: (err) => message.error(err.message),
+  });
 
   return (
     <>
@@ -112,6 +116,53 @@ const WorkersPage = () => {
             },
           },
           {
+            title: "Төлөв",
+            // order: 5,
+            valueType: "select",
+            fieldProps: {
+              options: [
+                {
+                  label: "Идэвхитэй",
+                  value: true,
+                },
+                {
+                  label: "Идэвхигүй",
+                  value: false,
+                },
+              ],
+            },
+            dataIndex: "isActive",
+            render: (_, record) => {
+              return (
+                <Popconfirm
+                disabled={updateStatus.loading}
+                  title={`Та ${record.isActive ? "идэвхигүй" : "идэвхитэй"} болгох уу?`}
+                  onConfirm={async() => {
+                    await updateStatus.runAsync({
+                      accountId: record.id,
+                      isActive: !record.isActive,
+                    });
+                    reload()
+                  }}
+                  okText="Тийм"
+                  cancelText="Үгүй"
+                >
+                  <Tag
+                    icon={
+                      record.isActive ? (
+                        <CheckCircleOutlined />
+                      ) : (
+                        <CloseCircleOutlined />
+                      )
+                    }
+                    color={record.isActive ? "success" : "error"}
+                    className="m-0"
+                  ></Tag>
+                </Popconfirm>
+              );
+            },
+          },
+          {
             title: "#",
             width: 180,
             key: "option",
@@ -187,15 +238,15 @@ const WorkersPage = () => {
           }}
         />
       )}
-      {/* {update && (
-        // <UpdateClient
-        //   data={update}
-        //   onFinish={() => {
-        //     setUpdate(null);
-        //     reload();
-        //   }}
+      {update && (
+        <UpdateWorkerAccount
+          data={update}
+          onFinish={() => {
+            setUpdate(null);
+            reload();
+          }}
         />
-      )} */}
+      )}
     </>
   );
 };

@@ -29,26 +29,35 @@ export interface CreateWorkerParams {
   warehouse: string[]
 }
 
+
 export interface UpdateWorkerParams extends Partial<CreateWorkerParams> {
   accountId: number
+  password?:string
 }
 
 
 const WorkerService = {
   getWorkerList: (body: GetWorkerListParams) =>
-    Api.post<ListResponse<WorkerAccount>>('/admin/worker/list', {
+    Api.post<ListResponse<WorkerAccount>>("/admin/worker/list", {
       hasAuth: true,
       body,
     }),
   createWorker: (body: CreateWorkerParams) =>
-    Api.post('/admin/worker/register', {
+    Api.post("/admin/worker/register", {
       hasAuth: true,
       body: {
         ...body,
       },
     }),
   updateWorker: (body: UpdateWorkerParams) =>
-    Api.post('/admin/client/update', {
+    Api.post("/admin/worker/update", {
+      hasAuth: true,
+      body: {
+        ...body,
+      },
+    }),
+  updateWorkerStatus: (body: { accountId: number; isActive: boolean }) =>
+    Api.post("/admin/worker/update/status", {
       hasAuth: true,
       body: {
         ...body,
@@ -179,7 +188,7 @@ const WorkerService = {
   //     hasAuth: true,
   //     body: data,
   //   }),
-}
+};
 
 
 export default WorkerService

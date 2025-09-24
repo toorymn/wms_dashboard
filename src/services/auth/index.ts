@@ -8,24 +8,31 @@ export interface LoginParams {
 
 export interface LoginResponse {
   jwtToken: string
+  refreshToken: string
   account: Account
 }
 
 
+
 const authTokenKey =  'app.token'
+const refreshToken = "refresh.token";
+
 
 
 const AuthService = {
   hasToken: () => !!localStorage.getItem(authTokenKey),
   getToken: () => localStorage.getItem(authTokenKey),
+  getRefreshToken: () => localStorage.getItem(refreshToken),
   removeToken: () => localStorage.removeItem(authTokenKey),
-  saveToken: (token: string) =>
-    localStorage.setItem(authTokenKey, token),
-  profile: () => Api.get<Account>('/auth/me', { hasAuth: true }),
+  saveToken: (token: string) => localStorage.setItem(authTokenKey, token),
+  saveRefreshToken: (token: string) => {
+    localStorage.setItem(refreshToken, token);
+  },
+  profile: () => Api.get<Account>("/auth/me", { hasAuth: true }),
   login: (body: LoginParams) =>
-    Api.post<LoginResponse>('/auth/admin/login', {
+    Api.post<LoginResponse>("/auth/admin/login", {
       body,
     }),
-}
+};
 
 export default AuthService

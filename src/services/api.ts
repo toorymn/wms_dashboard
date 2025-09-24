@@ -23,6 +23,57 @@ export interface Option {
   params?: AnyRecord
 }
 
+const apiClient = axios.create({
+  baseURL: baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 100 * 1000,
+  timeoutErrorMessage: "Time out",
+});
+
+
+
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !error.config._retry
+    ) {
+      error.config._retry = true;
+      try {
+        const refreshToken = await AuthService.getRefreshToken();
+        if (!refreshToken) throw error;
+        const resp = await axios.post(baseURL + "/auth/refresh-token", {
+          refreshToken,
+        });
+        if (resp.data.code !== 200) {
+          return Promise.reject(
+            new Error(resp.data.message)
+          );
+        }
+        const newToken = resp.data?.result?.access_token;
+        if (newToken) {
+          await AuthService.saveToken(newToken);
+          error.config.headers = error.config.headers || {};
+          error.config.headers["Authorization"] = `Bearer ${newToken}`;
+          return apiClient.request(error.config);
+        }
+      } catch (refreshError) {
+        localStorage.clear()
+        window.location.reload();
+        // useAuthStore.getState().logOut();
+        return Promise.reject(refreshError);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 const handleApiResponse = (
   _: AxiosRequestConfig,
   resp: AxiosResponse<BaseResponse<any>>,
@@ -61,9 +112,8 @@ const handleError = (err: any, reject: any) => {
 
 export const request = async <T>(options: AxiosRequestConfig) => {
   return new Promise<BaseResponse<T>>((resolve, reject) => {
-    axios
+    apiClient
       .request<BaseResponse<T>>({
-        baseURL,
         ...options,
       })
       .then((resp) => {

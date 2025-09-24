@@ -149,6 +149,7 @@ const PreShipmentItemsPage = () => {
                 const csvRows = [];
                 // Get headers
                 const headers = [
+                  "No",
                   "Section",
                   "Store",
                   "Bin",
@@ -160,6 +161,7 @@ const PreShipmentItemsPage = () => {
                 ];
                 csvRows.push(headers.join(","));
 
+                let no = 1
                 // Map records to CSV
                 records.forEach((record: PreShipmentOrderItem) => {
                   const box = Math.ceil(record.quantity / record.quantityInBox);
@@ -175,7 +177,8 @@ const PreShipmentItemsPage = () => {
                   ];
 
                   for (let i = 0; i < box; i++) {
-                    csvRows.push(row.map((v) => `"${v ?? ""}"`).join(","));
+                    csvRows.push(`"${no}"` + "," + row.map((v) => `"${v ?? ""}"`).join(","));
+                    no++
                   }
                 });
 

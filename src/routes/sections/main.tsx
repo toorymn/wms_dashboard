@@ -9,6 +9,7 @@ import AuthGuard from "@/context/auth-guard";
 import ShipmentsPage from "@/pages/shipment";
 import PreShipmentPage from "@/pages/label";
 import PreShipmentItemsPage from "@/pages/label/detail";
+import ShipmentItemsPage from "@/pages/shipment/history/detail";
 
 export const mainRoutes: RouteObject = {
   path: "/",
@@ -37,6 +38,10 @@ export const mainRoutes: RouteObject = {
     {
       path: "/shipment",
       element: <ShipmentsPage />,
+    },
+    {
+      path: "/shipment/:id",
+      element: <ShipmentItemsPage />,
     },
     {
       path: "/label",
