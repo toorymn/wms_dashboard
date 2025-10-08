@@ -48,6 +48,11 @@ const WareHouseZoneAssignmentTab: FC<Props> = ({ countId }) => {
             key: "firstName",
           },
           {
+            title: "Ажилтаны код",
+            dataIndex: "username",
+            key: "username",
+          },
+          {
             title: "Эхний тооллого",
             key: "level1",
             render: (_, record) => {
