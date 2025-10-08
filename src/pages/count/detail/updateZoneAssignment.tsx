@@ -63,15 +63,11 @@ export const UpdateZoneAssignment: FC<Props> = ({ onClose, data }) => {
           label="Эхний тооллого"
           name="countZones"
           tooltip="Select multiple zone numbers"
-          required
-          placeholder="Zone "
-          options={[
-            { label: "Zone 1", value: 1 },
-            { label: "Zone 2", value: 2 },
-            { label: "Zone 3", value: 3 },
-            { label: "Zone 4", value: 4 },
-            { label: "Zone 5", value: 5 },
-          ]}
+          placeholder="Zone"
+          options={Array.from({ length: 100 }, (_, i) => ({
+            label: `Zone ${i + 1}`,
+            value: i + 1,
+          }))}
         />
         <ProFormSelect
           mode="multiple"
@@ -79,15 +75,11 @@ export const UpdateZoneAssignment: FC<Props> = ({ onClose, data }) => {
           label="Давтан тооллого"
           name="confirmZones"
           tooltip="Select multiple zone numbers"
-          required
           placeholder="Zone Numbers"
-          options={[
-            { label: "Zone 1", value: 1 },
-            { label: "Zone 2", value: 2 },
-            { label: "Zone 3", value: 3 },
-            { label: "Zone 4", value: 4 },
-            { label: "Zone 5", value: 5 },
-          ]}
+          options={Array.from({ length: 100 }, (_, i) => ({
+            label: `Zone ${i + 1}`,
+            value: i + 1,
+          }))}
         />
       </ProForm.Group>
     </ModalForm>
