@@ -5,9 +5,9 @@ export enum COUNT_STATUS {
 }
 
 export const COUNT_STATUS_LABEL: Record<COUNT_STATUS, string> = {
-  [COUNT_STATUS.STARTED]: "Идвэхтэй",
+  [COUNT_STATUS.STARTED]: "Эхэлсэн",
   [COUNT_STATUS.CANCELLED]: "Хүчингүй болгосон",
-  [COUNT_STATUS.DONE]: "Хаагдсан",
+  [COUNT_STATUS.DONE]: "Илгээгдсэн",
 };
 
 const cubageConverter = (cm: number) => {

@@ -1,12 +1,13 @@
 import type { ActionType } from "@ant-design/pro-components";
 import { ProFormInstance, ProTable } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
-import { Flex, Input, message, Spin, Tag } from "antd";
+import { Button, Flex, Input, message, Spin, Tag } from "antd";
 import { FC, useRef, useState } from "react";
 import { CountService } from "@/services";
 import {
   CheckCircleOutlined,
   CloseOutlined,
+  DownloadOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
@@ -21,6 +22,10 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
   const [editRow, setEditRow] = useState<number | null>();
   const [editRowValue, setEditRowValue] = useState<number | null>();
   const fetch = useRequest(CountService.getCountWareHouseJournal, {
+    manual: true,
+    onError: (err) => message.error(err.message),
+  });
+  const download = useRequest(CountService.getCountWareHouseJournalReport, {
     manual: true,
     onError: (err) => message.error(err.message),
   });
@@ -187,7 +192,7 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
               } else if (record.level1Quantity != null) {
                 total = record.level1Quantity;
               }
-              const diff = record.quantity - total;
+              const diff = total - record.quantity;
               return <Tag color={diff !== 0 ? "red" : "success"}>{diff}</Tag>;
             },
           },
@@ -223,7 +228,76 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
           pageSizeOptions: [20, 100, 200, 1000, 2000, 30000],
         }}
         dateFormatter="string"
-        toolBarRender={() => []}
+        toolBarRender={() => [
+          <Button
+            loading={download.loading}
+            key="button"
+            type="dashed"
+            icon={<DownloadOutlined />}
+            onClick={async () => {
+              const tableFilters = ref.current?.getFieldsValue();
+
+              const data = await download.runAsync(Number(countId), {
+                ...tableFilters,
+                limit: 0,
+                offset: 0,
+              });
+
+              if (data && data.records) {
+                const records = data.records;
+                const csvRows = [];
+                // Get headers
+                const headers = [
+                  "№",
+                  "Барааны код",
+                  "Барааны нэр",
+                  "Хэмжих нэгж",
+                  "Эхний үлдэгдэл",
+                  "Тоолсон тоо",
+                  "Зөрүү",
+                  "Баталгаажуулсан бүс",
+                ];
+                csvRows.push(headers.join(","));
+
+                // Map records to CSV
+                records.forEach((record, idx) => {
+                  const diff = (record.total ?? 0) - record.targetSum;
+                  const row = [
+                    idx + 1,
+                    record.itemNo,
+                    record.description,
+                    record.unitOfMeasureCode,
+                    record.targetSum,
+                    record.total ?? "-",
+                    diff,
+                    "",
+                  ];
+
+                  csvRows.push(row.map((v) => `"${v ?? ""}"`).join(","));
+                });
+
+                const csvContent = "\uFEFF" + csvRows.join("\n");
+                const blob = new Blob([csvContent], {
+                  type: "text/csv;charset=utf-8;",
+                });
+                const url = URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute(
+                  "download",
+                  `warehouse_journal_count_report.csv`
+                );
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+              }
+            }}
+          >
+            Тайлан татах
+          </Button>,
+        ]}
       />
     </>
   );

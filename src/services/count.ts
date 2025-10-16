@@ -7,6 +7,8 @@ export interface InternalCount {
   warehouseJournalID: string;
   batchName: string;
   warehouseCode: string;
+  sentItemJournalsQuantity: number;
+  totalItemJournalsQuantity: number;
   status: COUNT_STATUS;
   createdAt: string;
 }
@@ -76,6 +78,14 @@ export interface WareHouseCountJournalItem {
   level3Quantity: number | null;
 }
 
+export interface WareHouseCountJournalItemReport {
+  itemNo: string;
+  targetSum: number;
+  description: string;
+  unitOfMeasureCode: string;
+  total: number | null;
+}
+
 export interface GetCountListParams extends PaginationRequest {
   status?: string;
   wareHouse?: string;
@@ -125,6 +135,10 @@ const CountService = {
     Api.get<ListResponse<WareHouseJournal>>("/admin/count/journals", {
       hasAuth: true,
     }),
+  getInternalCounter: (id: number) =>
+    Api.get<InternalCount>(`/admin/count/${id}`, {
+      hasAuth: true,
+    }),
   getCountInternalJournal: (id: number, body: GetCountInternalJournalParams) =>
     Api.post<ListResponse<InternalJournalItem>>(
       `/admin/count/${id}/internal-journal`,
@@ -133,9 +147,21 @@ const CountService = {
         body,
       }
     ),
+
   getCountWareHouseJournal: (id: number, body: GetCountInternalJournalParams) =>
     Api.post<ListResponse<WareHouseCountJournalItem>>(
       `/admin/count/${id}/warehouse-journal`,
+      {
+        hasAuth: true,
+        body,
+      }
+    ),
+  getCountWareHouseJournalReport: (
+    id: number,
+    body: GetCountInternalJournalParams
+  ) =>
+    Api.post<ListResponse<WareHouseCountJournalItemReport>>(
+      `/admin/count/${id}/report-journal`,
       {
         hasAuth: true,
         body,
@@ -191,6 +217,7 @@ const CountService = {
       body: {
         countId,
       },
+      timeout: 1000 * 60 * 10, // 10 minutes
     }),
   cancelCount: (countId: number) =>
     Api.post(`/admin/count/cancel`, {

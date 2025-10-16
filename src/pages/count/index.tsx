@@ -74,10 +74,10 @@ const CountPage = () => {
                 <Tag
                   color={
                     record.status == COUNT_STATUS.STARTED
-                      ? "success"
+                      ? "blue"
                       : record.status == COUNT_STATUS.CANCELLED
                       ? "default"
-                      : "volcano"
+                      : "success"
                   }
                   className="m-0"
                 >

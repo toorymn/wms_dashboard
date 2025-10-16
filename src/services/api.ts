@@ -1,26 +1,27 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import AuthService from './auth'
-import { BaseResponse } from './types/base'
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import AuthService from "./auth";
+import { BaseResponse } from "./types/base";
 
-const baseURL = import.meta.env.VITE_API_URL
-console.log(baseURL)
+const baseURL = import.meta.env.VITE_API_URL;
+console.log(baseURL);
 
-type AnyRecord<T extends string | number | symbol = string> = Record<T, any>
+type AnyRecord<T extends string | number | symbol = string> = Record<T, any>;
 
 export class ApiErrorResponse extends Error {
-  public statusCode
+  public statusCode;
 
   constructor(statusCode: number, message: string) {
-    super(message)
-    this.statusCode = statusCode
+    super(message);
+    this.statusCode = statusCode;
   }
 }
 
 export interface Option {
-  body?: AnyRecord
-  hasAuth?: boolean
-  headers?: AnyRecord
-  params?: AnyRecord
+  body?: AnyRecord;
+  hasAuth?: boolean;
+  headers?: AnyRecord;
+  params?: AnyRecord;
+  timeout?: number;
 }
 
 const apiClient = axios.create({
@@ -31,8 +32,6 @@ const apiClient = axios.create({
   timeout: 100 * 1000,
   timeoutErrorMessage: "Time out",
 });
-
-
 
 apiClient.interceptors.response.use(
   (response) => {
@@ -52,9 +51,7 @@ apiClient.interceptors.response.use(
           refreshToken,
         });
         if (resp.data.code !== 200) {
-          return Promise.reject(
-            new Error(resp.data.message)
-          );
+          return Promise.reject(new Error(resp.data.message));
         }
         const newToken = resp.data?.result?.access_token;
         if (newToken) {
@@ -64,7 +61,7 @@ apiClient.interceptors.response.use(
           return apiClient.request(error.config);
         }
       } catch (refreshError) {
-        localStorage.clear()
+        localStorage.clear();
         window.location.reload();
         // useAuthStore.getState().logOut();
         return Promise.reject(refreshError);
@@ -80,90 +77,92 @@ const handleApiResponse = (
   resolve: any,
   reject: any
 ) => {
-  const statusCode = resp.data.code
+  const statusCode = resp.data.code;
 
   if (statusCode == 401) {
-    reject(new ApiErrorResponse(201, resp.data.message))
-    return
+    reject(new ApiErrorResponse(201, resp.data.message));
+    return;
   }
 
   if (statusCode == 200) {
-    resolve(resp.data)
-    return
+    resolve(resp.data);
+    return;
   }
 
-  reject(new ApiErrorResponse(statusCode, resp.data.message))
-}
+  reject(new ApiErrorResponse(statusCode, resp.data.message));
+};
 
 export const getAuth = (hasAuth = false) =>
   hasAuth && AuthService.getToken()
     ? {
         Authorization: `Bearer ${AuthService.getToken()}`,
       }
-    : {}
+    : {};
 
 export const genHeader = (hasAuth = false, headers = {}) =>
-  Object.assign(headers, getAuth(hasAuth))
+  Object.assign(headers, getAuth(hasAuth));
 
 const handleError = (err: any, reject: any) => {
-  console.debug(err)
-  reject(new Error('Something went wrong'))
-}
+  console.debug(err);
+  reject(new Error("Something went wrong"));
+};
 
 export const request = async <T>(options: AxiosRequestConfig) => {
   return new Promise<BaseResponse<T>>((resolve, reject) => {
     apiClient
       .request<BaseResponse<T>>({
         ...options,
+        timeout: options.timeout || 100 * 1000,
       })
       .then((resp) => {
-        handleApiResponse(options, resp, resolve, reject)
+        handleApiResponse(options, resp, resolve, reject);
       })
-      .catch((err) => handleError(err, reject))
-  })
-}
+      .catch((err) => handleError(err, reject));
+  });
+};
 
 export const get = async <T>(url: string, options?: Option): Promise<T> => {
   return request<T>({
-    method: 'GET',
+    method: "GET",
     url,
     headers: genHeader(options?.hasAuth, options?.headers),
     params: options?.params,
-  }).then((data) => data.result)
-}
+  }).then((data) => data.result);
+};
 
 export const post = async <T>(url: string, options?: Option): Promise<T> => {
   return request<T>({
-    method: 'POST',
+    method: "POST",
     url,
+    timeout: options?.timeout,
     headers: genHeader(options?.hasAuth, options?.headers),
     data: options?.body,
-  }).then((data) => data.result)
-}
+  }).then((data) => data.result);
+};
 
 export const put = async <T>(url: string, options?: Option): Promise<T> => {
   return request<T>({
-    method: 'PUT',
+    method: "PUT",
     url,
     headers: genHeader(options?.hasAuth, options?.headers),
     data: options?.body,
-  }).then((data) => data.result)
-}
+  }).then((data) => data.result);
+};
 
 export const del = async <T>(url: string, options?: Option): Promise<T> => {
   return request<T>({
-    method: 'DELETE',
+    method: "DELETE",
     url,
     headers: genHeader(options?.hasAuth, options?.headers),
     data: options?.body,
-  }).then((data) => data.result)
-}
+  }).then((data) => data.result);
+};
 
 const Api = {
   get,
   post,
   put,
   del,
-}
+};
 
-export default Api
+export default Api;
