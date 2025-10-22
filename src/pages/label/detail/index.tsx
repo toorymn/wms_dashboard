@@ -10,6 +10,7 @@ import { Button, message } from "antd";
 import { useRef } from "react";
 import ShipmentService, { PreShipmentOrderItem } from "@/services/shipment";
 import { useNavigate, useParams } from "react-router-dom";
+import * as XLSX from "xlsx";
 
 const PreShipmentItemsPage = () => {
   const actionRef = useRef<ActionType>();
@@ -146,55 +147,76 @@ const PreShipmentItemsPage = () => {
 
               if (data && data.records) {
                 const records = data.records;
-                const csvRows = [];
-                // Get headers
-                const headers = [
-                  "No",
-                  "Section",
-                  "Store",
-                  "Bin",
-                  "Gate",
-                  "Бар код",
-                  "Барааны нэр",
-                  "Packet",
-                  "Sum of Box",
-                ];
-                csvRows.push(headers.join(","));
 
-                let no = 1
-                // Map records to CSV
+                // Prepare data for Excel export
+                const worksheetData: unknown[][] = [
+                  // Headers
+                  [
+                    "No",
+                    "Section",
+                    "Store",
+                    "Bin",
+                    "Gate",
+                    "Бар код",
+                    "Барааны нэр",
+                    "Packet",
+                    "Sum of Box",
+                  ],
+                  // Data rows
+                ];
+
+                let no = 1;
+                // Map records to Excel data
                 records.forEach((record: PreShipmentOrderItem) => {
                   const box = Math.ceil(record.quantity / record.quantityInBox);
-                  const row = [
-                    "",
-                    record.destination,
-                    record.takeBin,
-                    "Gate-X",
-                    record.itemNo,
-                    record.name,
-                    record.quantityInBox,
-                    box,
-                  ];
 
                   for (let i = 0; i < box; i++) {
-                    csvRows.push(`"${no}"` + "," + row.map((v) => `"${v ?? ""}"`).join(","));
-                    no++
+                    worksheetData.push([
+                      no,
+                      record.destination,
+                      record.takeBin,
+                      "Gate-X",
+                      record.itemNo, // This will preserve leading zeros as text
+                      record.name,
+                      record.quantityInBox,
+                      box,
+                    ]);
+                    no++;
                   }
                 });
 
-                const csvContent = "\uFEFF" + csvRows.join("\n");
-                const blob = new Blob([csvContent], {
-                  type: "text/csv;charset=utf-8;",
-                });
-                const url = URL.createObjectURL(blob);
+                // Create workbook and worksheet
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", "labels.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                // Set column widths for better display
+                const columnWidths = [
+                  { wch: 5 }, // No
+                  { wch: 12 }, // Section
+                  { wch: 15 }, // Store
+                  { wch: 10 }, // Bin
+                  { wch: 8 }, // Gate
+                  { wch: 15 }, // Бар код
+                  { wch: 30 }, // Барааны нэр
+                  { wch: 10 }, // Packet
+                  { wch: 12 }, // Sum of Box
+                ];
+                worksheet["!cols"] = columnWidths;
+
+                // Format "Бар код" column as text to preserve leading zeros
+                const range = XLSX.utils.decode_range(worksheet["!ref"]!);
+                for (let row = 1; row <= range.e.r; row++) {
+                  const cellAddress = XLSX.utils.encode_cell({ r: row, c: 4 }); // Column E (Бар код)
+                  if (worksheet[cellAddress]) {
+                    worksheet[cellAddress].t = "s"; // Set cell type to string
+                  }
+                }
+
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Labels");
+
+                // Generate and download Excel file
+                XLSX.writeFile(workbook, "labels.xlsx");
               }
             }}
           >

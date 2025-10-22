@@ -12,6 +12,7 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import { WareHouseCountJournalItem } from "@/services/count";
+import * as XLSX from "xlsx";
 
 interface Props {
   countId: number;
@@ -245,53 +246,71 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
 
               if (data && data.records) {
                 const records = data.records;
-                const csvRows = [];
-                // Get headers
-                const headers = [
-                  "№",
-                  "Барааны код",
-                  "Барааны нэр",
-                  "Хэмжих нэгж",
-                  "Эхний үлдэгдэл",
-                  "Тоолсон тоо",
-                  "Зөрүү",
-                  "Баталгаажуулсан бүс",
+
+                // Prepare data for Excel export
+                const worksheetData = [
+                  // Headers
+                  [
+                    "№",
+                    "Барааны код",
+                    "Барааны нэр",
+                    "Хэмжих нэгж",
+                    "Эхний үлдэгдэл",
+                    "Тоолсон тоо",
+                    "Зөрүү",
+                    "Баталгаажуулсан бүс",
+                  ],
+                  // Data rows
+                  ...records.map((record, idx) => {
+                    const diff = (record.total ?? 0) - record.targetSum;
+                    return [
+                      idx + 1,
+                      record.itemNo, // This will preserve leading zeros as text
+                      record.description,
+                      record.unitOfMeasureCode,
+                      record.targetSum,
+                      record.total ?? "-",
+                      diff,
+                      "",
+                    ];
+                  }),
                 ];
-                csvRows.push(headers.join(","));
 
-                // Map records to CSV
-                records.forEach((record, idx) => {
-                  const diff = (record.total ?? 0) - record.targetSum;
-                  const row = [
-                    idx + 1,
-                    record.itemNo,
-                    record.description,
-                    record.unitOfMeasureCode,
-                    record.targetSum,
-                    record.total ?? "-",
-                    diff,
-                    "",
-                  ];
+                // Create workbook and worksheet
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
-                  csvRows.push(row.map((v) => `"${v ?? ""}"`).join(","));
-                });
+                // Set column widths for better display
+                const columnWidths = [
+                  { wch: 5 }, // №
+                  { wch: 15 }, // Барааны код
+                  { wch: 30 }, // Барааны нэр
+                  { wch: 12 }, // Хэмжих нэгж
+                  { wch: 15 }, // Эхний үлдэгдэл
+                  { wch: 12 }, // Тоолсон тоо
+                  { wch: 10 }, // Зөрүү
+                  { wch: 18 }, // Баталгаажуулсан бүс
+                ];
+                worksheet["!cols"] = columnWidths;
 
-                const csvContent = "\uFEFF" + csvRows.join("\n");
-                const blob = new Blob([csvContent], {
-                  type: "text/csv;charset=utf-8;",
-                });
-                const url = URL.createObjectURL(blob);
+                // Format "Барааны код" column as text to preserve leading zeros
+                const range = XLSX.utils.decode_range(worksheet["!ref"]!);
+                for (let row = 1; row <= range.e.r; row++) {
+                  const cellAddress = XLSX.utils.encode_cell({ r: row, c: 1 }); // Column B (Барааны код)
+                  if (worksheet[cellAddress]) {
+                    worksheet[cellAddress].t = "s"; // Set cell type to string
+                  }
+                }
 
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute(
-                  "download",
-                  `warehouse_journal_count_report.csv`
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(
+                  workbook,
+                  worksheet,
+                  "Warehouse Journal"
                 );
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+
+                // Generate and download Excel file
+                XLSX.writeFile(workbook, `warehouse_journal_count_report.xlsx`);
               }
             }}
           >

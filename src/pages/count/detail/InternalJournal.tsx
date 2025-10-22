@@ -6,6 +6,7 @@ import { Button, message, Tag } from "antd";
 import { FC, useRef, useState } from "react";
 import { CountService } from "@/services";
 import { InternalJournalItem } from "@/services/count";
+import * as XLSX from "xlsx";
 
 interface Props {
   countId: number;
@@ -209,94 +210,122 @@ const CountInternalJournalTab: FC<Props> = ({ countId }) => {
 
                     if (data && data.records) {
                       const records = data.records;
-                      const csvRows = [];
-                      // Get headers
-                      const headers = [
-                        "Барааны код",
-                        "Огноо",
-                        "Барааны нэр",
-                        "Хэмжих нэгж",
-                        "Тооллогын бүс",
-                        "Тоологчийн нэр",
-                        "Баталгаажуулагын нэр",
-                        "Bin",
-                        "Тоолсон тоо",
-                        "Баталгаажуулсан тоо",
-                        "Зөрүү",
+
+                      // Prepare data for Excel export
+                      const worksheetData: unknown[][] = [
+                        // Headers
+                        [
+                          "Барааны код",
+                          "Огноо",
+                          "Барааны нэр",
+                          "Хэмжих нэгж",
+                          "Тооллогын бүс",
+                          "Тоологчийн нэр",
+                          "Баталгаажуулагын нэр",
+                          "Bin",
+                          "Тоолсон тоо",
+                          "Баталгаажуулсан тоо",
+                          "Зөрүү",
+                        ],
+                        // Data rows
+                        ...records.map((record: InternalJournalItem) => {
+                          const level1Worker =
+                            record.level1WorkerLastName &&
+                            record.level1WorkerFirstName
+                              ? `${record.level1WorkerLastName?.at(0)}.${
+                                  record.level1WorkerFirstName
+                                }`
+                              : "-";
+
+                          const level2Worker =
+                            record.level2WorkerLastName &&
+                            record.level2WorkerFirstName
+                              ? `${record.level2WorkerLastName?.at(0)}.${
+                                  record.level2WorkerFirstName
+                                }`
+                              : "-";
+
+                          let diff = 0;
+                          if (
+                            record.level2Quantity != null &&
+                            record.level1Quantity == null
+                          ) {
+                            diff = -record.level2Quantity;
+                          }
+                          if (
+                            record.level1Quantity != null &&
+                            record.level2Quantity == null
+                          ) {
+                            diff = -record.level1Quantity;
+                          }
+                          if (
+                            record.level1Quantity != null &&
+                            record.level2Quantity != null
+                          ) {
+                            diff =
+                              record.level2Quantity - record.level1Quantity;
+                          }
+
+                          return [
+                            record.itemNo, // Will preserve leading zeros as text
+                            record.createdAt,
+                            record.description,
+                            record.unitOfMeasureCode,
+                            record.zone,
+                            level1Worker,
+                            level2Worker,
+                            record.binCode,
+                            record.level1Quantity ?? "-",
+                            record.level2Quantity ?? "-",
+                            diff,
+                          ];
+                        }),
                       ];
-                      csvRows.push(headers.join(","));
 
-                      // Map records to CSV
-                      records.forEach((record: InternalJournalItem) => {
-                        const level1Worker =
-                          record.level1WorkerLastName &&
-                          record.level1WorkerFirstName
-                            ? `${record.level1WorkerLastName?.at(0)}.${
-                                record.level1WorkerFirstName
-                              }`
-                            : "-";
+                      // Create workbook and worksheet
+                      const workbook = XLSX.utils.book_new();
+                      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
-                        const level2Worker =
-                          record.level2WorkerLastName &&
-                          record.level2WorkerFirstName
-                            ? `${record.level2WorkerLastName?.at(0)}.${
-                                record.level2WorkerFirstName
-                              }`
-                            : "-";
+                      // Set column widths for better display
+                      const columnWidths = [
+                        { wch: 15 }, // Барааны код
+                        { wch: 18 }, // Огноо
+                        { wch: 30 }, // Барааны нэр
+                        { wch: 12 }, // Хэмжих нэгж
+                        { wch: 12 }, // Тооллогын бүс
+                        { wch: 15 }, // Тоологчийн нэр
+                        { wch: 18 }, // Баталгаажуулагын нэр
+                        { wch: 10 }, // Bin
+                        { wch: 12 }, // Тоолсон тоо
+                        { wch: 18 }, // Баталгаажуулсан тоо
+                        { wch: 8 }, // Зөрүү
+                      ];
+                      worksheet["!cols"] = columnWidths;
 
-                        let diff = 0;
-                        if (
-                          record.level2Quantity != null &&
-                          record.level1Quantity == null
-                        ) {
-                          diff = -record.level2Quantity;
+                      // Format "Барааны код" column as text to preserve leading zeros
+                      const range = XLSX.utils.decode_range(worksheet["!ref"]!);
+                      for (let row = 1; row <= range.e.r; row++) {
+                        const cellAddress = XLSX.utils.encode_cell({
+                          r: row,
+                          c: 0,
+                        }); // Column A (Барааны код)
+                        if (worksheet[cellAddress]) {
+                          worksheet[cellAddress].t = "s"; // Set cell type to string
                         }
-                        if (
-                          record.level1Quantity != null &&
-                          record.level2Quantity == null
-                        ) {
-                          diff = -record.level1Quantity;
-                        }
-                        if (
-                          record.level1Quantity != null &&
-                          record.level2Quantity != null
-                        ) {
-                          diff = record.level2Quantity - record.level1Quantity;
-                        }
+                      }
 
-                        const row = [
-                          record.itemNo,
-                          record.createdAt,
-                          record.description,
-                          record.unitOfMeasureCode,
-                          record.zone,
-                          level1Worker,
-                          level2Worker,
-                          record.binCode,
-                          record.level1Quantity ?? "-",
-                          record.level2Quantity ?? "-",
-                          diff,
-                        ];
-
-                        csvRows.push(row.map((v) => `"${v ?? ""}"`).join(","));
-                      });
-
-                      const csvContent = "\uFEFF" + csvRows.join("\n");
-                      const blob = new Blob([csvContent], {
-                        type: "text/csv;charset=utf-8;",
-                      });
-                      const url = URL.createObjectURL(blob);
-
-                      const link = document.createElement("a");
-                      link.href = url;
-                      link.setAttribute(
-                        "download",
-                        `internal_journal_zone_${zoneFilter}.csv`
+                      // Add worksheet to workbook
+                      XLSX.utils.book_append_sheet(
+                        workbook,
+                        worksheet,
+                        "Internal Journal"
                       );
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                      URL.revokeObjectURL(url);
+
+                      // Generate and download Excel file
+                      XLSX.writeFile(
+                        workbook,
+                        `internal_journal_zone_${zoneFilter}.xlsx`
+                      );
                     }
                   }}
                 >
