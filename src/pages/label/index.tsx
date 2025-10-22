@@ -88,7 +88,7 @@ const PreShipmentPage: FC = () => {
               search: false,
             },
             {
-              title: "Эзэлхүүн",
+              title: "Эзлэхүүн",
               dataIndex: "cbm",
               key: "cbm",
               order: 7,

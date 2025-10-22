@@ -124,7 +124,7 @@ const ShipmentHistoryPage: FC<{
             },
           },
           {
-            title: "Эзэлхүүн",
+            title: "Эзлэхүүн",
             dataIndex: "cbm",
             key: "cbm",
             order: 7,

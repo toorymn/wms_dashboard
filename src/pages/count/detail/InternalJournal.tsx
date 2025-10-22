@@ -77,7 +77,7 @@ const CountInternalJournalTab: FC<Props> = ({ countId }) => {
             },
           },
           {
-            title: "Тооллогчын нэр",
+            title: "Тоологчийн нэр",
             search: false,
             render: (_, record) => {
               if (
@@ -93,7 +93,7 @@ const CountInternalJournalTab: FC<Props> = ({ countId }) => {
             },
           },
           {
-            title: "Баталгажуулагийн нэр",
+            title: " Баталгаажуулагчийн нэр",
             search: false,
             render: (_, record) => {
               if (
@@ -217,7 +217,7 @@ const CountInternalJournalTab: FC<Props> = ({ countId }) => {
                         "Барааны нэр",
                         "Хэмжих нэгж",
                         "Тооллогын бүс",
-                        "Тооллогчын нэр",
+                        "Тоологчийн нэр",
                         "Баталгаажуулагын нэр",
                         "Bin",
                         "Тоолсон тоо",
