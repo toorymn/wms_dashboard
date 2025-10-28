@@ -278,7 +278,7 @@ const ShipmentHistoryPage: FC<{
                     record.destinationNo,
                     record.itemNo,
                     record.name,
-                    record.shipmentQty,
+                    record.quantity,
                     cubageConverter(record.cubage),
                     record.placeBin,
                   ]),

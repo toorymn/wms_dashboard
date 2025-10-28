@@ -58,8 +58,8 @@ export interface ShipmentDestinationItem {
   locationCode: string;
   destinationNo: string;
   name: string;
-  itemNo: string
-  shipmentQty: number;
+  itemNo: string;
+  quantity: number;
   cubage: number;
   placeBin: string;
 }
