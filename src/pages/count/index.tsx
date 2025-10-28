@@ -32,7 +32,12 @@ const CountPage = () => {
             width: 48,
           },
           {
-            title: "Тооллогын дугаар",
+            title: "Тооллогын нэр",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Batch дугаар",
             dataIndex: "batchName",
             key: "batchName",
           },
@@ -43,8 +48,7 @@ const CountPage = () => {
             search: false,
           },
           {
-            title: "Салбар",
-            search: false,
+            title: "Агуулах",
             dataIndex: "warehouseCode",
             key: "warehouseCode",
           },

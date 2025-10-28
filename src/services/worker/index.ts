@@ -1,40 +1,38 @@
-import Api from '../api'
-import { ListResponse, PaginationRequest } from '../types/base'
+import { AccountRole } from "@/context/auth";
+import Api from "../api";
+import { ListResponse, PaginationRequest } from "../types/base";
 
 export interface WorkerAccount {
-  id: number
-  accessWareHouses: string[]
-  createdAt: string
-  firstName: string
-  isActive: boolean
-  lastName: string
-  role: number
-  updatedAt: string
-  username: string
+  id: number;
+  accessWareHouses: string[];
+  createdAt: string;
+  firstName: string;
+  isActive: boolean;
+  lastName: string;
+  role: number;
+  updatedAt: string;
+  username: string;
 }
 
-
-
 export interface GetWorkerListParams extends PaginationRequest {
-  firstName?: string
-  lastName?: string
-  userName?: string
+  firstName?: string;
+  lastName?: string;
+  userName?: string;
 }
 
 export interface CreateWorkerParams {
-  username:string
-  firstName: string
-  lastName: string
-  password: string
-  warehouse: string[]
+  username: string;
+  firstName: string;
+  lastName: string;
+  role: AccountRole | null | undefined;
+  password: string;
+  warehouse: string[];
 }
-
 
 export interface UpdateWorkerParams extends Partial<CreateWorkerParams> {
-  accountId: number
-  password?:string
+  accountId: number;
+  password?: string;
 }
-
 
 const WorkerService = {
   getWorkerList: (body: GetWorkerListParams) =>
@@ -190,5 +188,4 @@ const WorkerService = {
   //   }),
 };
 
-
-export default WorkerService
+export default WorkerService;

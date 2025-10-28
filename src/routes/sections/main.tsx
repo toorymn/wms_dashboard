@@ -2,7 +2,7 @@ import { SplashScreen } from "components";
 import { MainLayout } from "layouts";
 import { Suspense } from "react";
 import { Outlet, RouteObject } from "react-router-dom";
-import WorkerAccountListPage from "pages/workers";
+import AccountListPage from "pages/accounts";
 import CountHomePage from "pages/count";
 import CountDetailPage from "pages/count/detail";
 import AuthGuard from "@/context/auth-guard";
@@ -33,7 +33,7 @@ export const mainRoutes: RouteObject = {
     },
     {
       path: "/account",
-      element: <WorkerAccountListPage />,
+      element: <AccountListPage />,
     },
     {
       path: "/shipment",

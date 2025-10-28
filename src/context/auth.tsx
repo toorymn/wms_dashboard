@@ -3,9 +3,13 @@ import { message } from "antd";
 import React, { FC, ReactNode, useContext, useEffect, useState } from "react";
 import { AuthService } from "@/services";
 
+export type AccountRole = 100 | 110;
+
 export interface Account {
   username: string;
   firstName: string;
+  role: AccountRole;
+  managerWarehouses: string[];
   lastName: string;
 }
 

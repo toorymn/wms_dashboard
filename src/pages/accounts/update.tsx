@@ -1,3 +1,4 @@
+import { useAuthContext } from "@/context/auth";
 import { WorkerService } from "@/services";
 import ReferenceService from "@/services/ref";
 import { UpdateWorkerParams, WorkerAccount } from "@/services/worker";
@@ -25,6 +26,8 @@ export const UpdateWorkerAccount: FC<Props> = ({ data, onFinish }) => {
     onError: (err) => message.error(err.message),
   });
 
+  const { user } = useAuthContext();
+
   const warehouseFetch = useRequest(ReferenceService.warehouses, {
     onError: (err) => message.error(err.message),
   });
@@ -37,7 +40,8 @@ export const UpdateWorkerAccount: FC<Props> = ({ data, onFinish }) => {
       initialValues={{
         firstName: data.firstName,
         lastName: data.lastName,
-        warehouse:data.accessWareHouses,
+        role: data.role,
+        warehouse: data.accessWareHouses,
         username: data.username,
       }}
       autoFocusFirstInput
@@ -48,12 +52,13 @@ export const UpdateWorkerAccount: FC<Props> = ({ data, onFinish }) => {
       onFinish={async (values) => {
         if (
           await update.runAsync({
-              lastName: values.lastName,
-              firstName: values.firstName,
-              username: values.username,
-              warehouse: values.warehouse,
-              password: values.password,  
-              accountId:data.id,
+            lastName: values.lastName,
+            firstName: values.firstName,
+            username: values.username,
+            warehouse: values.warehouse,
+            password: values.password,
+            accountId: data.id,
+            role: values.role,
           })
         ) {
           onFinish();
@@ -114,6 +119,27 @@ export const UpdateWorkerAccount: FC<Props> = ({ data, onFinish }) => {
           placeholder="Please select"
           rules={[{ required: true, message: "Please select!" }]}
         />
+
+        {user?.role === 100 && (
+          <ProFormSelect
+            mode="single"
+            width={"md"}
+            name="role"
+            options={[
+              {
+                label: "Агуулах ажилтан",
+                value: 200,
+              },
+              {
+                label: "Салбарын менежер",
+                value: 110,
+              },
+            ]}
+            label="Үүрэг"
+            placeholder="Please select"
+            rules={[{ required: true, message: "Please select!" }]}
+          />
+        )}
       </ProForm.Group>
     </DrawerForm>
   );

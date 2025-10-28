@@ -6,7 +6,6 @@ import {
   CollapseProps,
   Flex,
   Result,
-  Row,
   Statistic,
   Table,
   Typography,
@@ -48,17 +47,17 @@ const ShipmentReportPage: FC<{
     return <Result status="info" title="No data" />;
   }
   return (
-    <Flex dir={"column"} gap={"large"} style={{ width: "100%" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {fetch.data?.records.map((warehouse) => (
         <Card
           key={warehouse.locationCode}
           title={warehouse.locationCode}
-          style={{ width: "100%" }}
+          style={{ width: "100%", maxWidth: "100%" }}
         >
           <ShipmentReportLocation warehouse={warehouse} />
         </Card>
       ))}
-    </Flex>
+    </div>
   );
 };
 
@@ -68,10 +67,10 @@ const ShipmentReportLocation: FC<{ warehouse: LocationReportGate }> = ({
   const items: CollapseProps["items"] = warehouse.gates.map((report) => ({
     key: report.gate,
     label: (
-      <Row justify={"space-between"}>
+      <Flex dir={"column"} gap={"small"} style={{ width: "100%" }}>
         <Typography.Title level={5}>{report.gate}</Typography.Title>
-        <Flex align={"middle"} gap={"small"}>
-          <Card size="small">
+        <Flex dir={"column"} gap={"small"} style={{ width: "100%" }}>
+          <Card size="small" style={{ width: "100%" }}>
             <Statistic
               title="Total"
               value={cubageConverter(report.cbm)}
@@ -79,7 +78,7 @@ const ShipmentReportLocation: FC<{ warehouse: LocationReportGate }> = ({
               suffix="m³"
             />
           </Card>
-          <Card size="small">
+          <Card size="small" style={{ width: "100%" }}>
             <Statistic
               title="Машин 1"
               value={(cubageConverter(report.cbm) / machine1) * 100}
@@ -93,7 +92,7 @@ const ShipmentReportLocation: FC<{ warehouse: LocationReportGate }> = ({
             />
           </Card>
 
-          <Card size="small">
+          <Card size="small" style={{ width: "100%" }}>
             <Statistic
               title="Машин 2"
               value={(cubageConverter(report.cbm) / machine2) * 100}
@@ -107,7 +106,7 @@ const ShipmentReportLocation: FC<{ warehouse: LocationReportGate }> = ({
             />
           </Card>
         </Flex>
-      </Row>
+      </Flex>
     ),
     children: (
       <Table<ShipmentOrder>

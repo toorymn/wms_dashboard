@@ -1,4 +1,9 @@
-import { CheckCircleOutlined, CloseCircleOutlined, EditFilled, PlusOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  EditFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
 import type { ActionType } from "@ant-design/pro-components";
 import { ProFormInstance, ProTable } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
@@ -56,59 +61,45 @@ const WorkersPage = () => {
             key: "lastName",
           },
           {
+            title: "Үүрэг",
+            order: 2,
+            dataIndex: "role",
+            key: "role",
+            valueType: "select",
+            fieldProps: {
+              options: [
+                {
+                  label: "Салбарын менежер",
+                  value: 110,
+                },
+                {
+                  label: "Ажилтан",
+                  value: 200,
+                },
+              ],
+            },
+            render: (_, record) => {
+              const roleMap = {
+                110: "Салбарын менежер",
+                200: "Ажилтан",
+              };
+              return (
+                roleMap[record.role as keyof typeof roleMap] || record.role
+              );
+            },
+          },
+          {
             title: "Нэвтрэх нэр",
             order: 3,
             dataIndex: "username",
             key: "username",
           },
-          // {
-          //   title: "Төлөв",
-          //   // order: 5,
-          //   valueType: "select",
-          //   fieldProps: {
-          //     options: [
-          //       {
-          //         label: "Идэвхитэй",
-          //         value: true,
-          //       },
-          //       {
-          //         label: "Идэвхигүй",
-          //         value: false,
-          //       },
-          //     ],
-          //   },
-          //   dataIndex: "isActive",
-          //   render: (_, record) => {
-          //     return (
-          //       <Tag
-          //         icon={
-          //           record.isActive ? (
-          //             <CheckCircleOutlined />
-          //           ) : (
-          //             <CloseCircleOutlined />
-          //           )
-          //         }
-          //         color={record.isActive ? "success" : "error"}
-          //         className="m-0"
-          //       ></Tag>
-          //     );
-          //   },
-          // },
           {
             title: "Агуулах",
             dataIndex: "accessWareHouses",
             key: "accessWareHouses",
             order: 7,
             search: false,
-            // valueType: "select",
-            // fieldProps: {
-            //   options: COMPANIES.map((item) => {
-            //     return {
-            //       label: item.name,
-            //       value: item.id,
-            //     };
-            //   }),
-            // },
             render: (_, record) => {
               return (
                 <Tag color="blue">{record.accessWareHouses.join(",")}</Tag>
@@ -135,14 +126,16 @@ const WorkersPage = () => {
             render: (_, record) => {
               return (
                 <Popconfirm
-                disabled={updateStatus.loading}
-                  title={`Та ${record.isActive ? "идэвхигүй" : "идэвхитэй"} болгох уу?`}
-                  onConfirm={async() => {
+                  disabled={updateStatus.loading}
+                  title={`Та ${
+                    record.isActive ? "идэвхигүй" : "идэвхитэй"
+                  } болгох уу?`}
+                  onConfirm={async () => {
                     await updateStatus.runAsync({
                       accountId: record.id,
                       isActive: !record.isActive,
                     });
-                    reload()
+                    reload();
                   }}
                   okText="Тийм"
                   cancelText="Үгүй"
@@ -216,7 +209,7 @@ const WorkersPage = () => {
           pageSizeOptions: [20, 100, 200, 1000, 2000, 30000],
         }}
         dateFormatter="string"
-        headerTitle="Ажилчдын жагсаалт"
+        headerTitle="Хэрэглэгчдийн жагсаалт"
         toolBarRender={() => [
           <Button
             key="button"
@@ -226,7 +219,7 @@ const WorkersPage = () => {
             }}
             type="primary"
           >
-            Ажилтан нэмэх
+            Хэрэглэгч үүсгэх
           </Button>,
         ]}
       />

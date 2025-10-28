@@ -62,10 +62,17 @@ const MainLayout: React.FC<{ children?: React.ReactNode }> = (props) => {
         menu={{
           collapsedShowGroupTitle: true,
         }}
+        actionsRender={() => {
+          return <>{(user?.managerWarehouses || []).join(",")}</>;
+        }}
         avatarProps={{
           src: "https://avatar.iran.liara.run/public/30",
           size: "large",
-          title: user?.firstName,
+          title:
+            user?.lastName?.at(0)?.toUpperCase() +
+            "." +
+            user?.firstName +
+            (user?.role == 100 ? " (Админ)" : "(Салбарын менежер)"),
           render: (__, dom) => {
             return (
               <Dropdown
@@ -103,13 +110,15 @@ const MainLayout: React.FC<{ children?: React.ReactNode }> = (props) => {
         menuFooterRender={(props) => {
           if (props?.collapsed) return undefined;
           return (
-            <div
-              style={{
-                textAlign: "center",
-                paddingBlockStart: 12,
-              }}
-            >
-              <div>© by Boost LLC</div>
+            <div>
+              <div
+                style={{
+                  textAlign: "center",
+                  paddingBlockStart: 12,
+                }}
+              >
+                <div>© by Boost LLC</div>
+              </div>
             </div>
           );
         }}

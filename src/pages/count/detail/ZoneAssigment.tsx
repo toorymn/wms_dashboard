@@ -46,15 +46,17 @@ const WareHouseZoneAssignmentTab: FC<Props> = ({ countId }) => {
             title: "Нэр",
             dataIndex: "firstName",
             key: "firstName",
+            search: false,
           },
           {
             title: "Ажилтны код",
-            dataIndex: "username",
-            key: "username",
+            dataIndex: "userName",
+            key: "userName",
           },
           {
             title: "Эхний тооллого",
             key: "level1",
+            search: false,
             render: (_, record) => {
               return (
                 <Flex gap="4px 0" wrap>

@@ -39,29 +39,30 @@ const ZoneOverViewTab: FC<Props> = ({ countId }) => {
           },
           {
             title: "Тоологч овог",
-            dataIndex: "level1FirstName",
-            key: "level1FirstName",
+            dataIndex: "level1LastName",
+            key: "level1LastName",
             search: false,
           },
           {
             title: "Тоологч нэр",
-            dataIndex: "level1LastName",
-            key: "level1LastName",
+            dataIndex: "level1FirstName",
+            key: "level1FirstName",
             search: false,
           },
 
           {
             title: "Баталгаажуулагч овог",
-            dataIndex: "level2FirstName",
-            key: "level2FirstName",
-            search: false,
-          },
-          {
-            title: "Баталгаажуулагч нэр",
             dataIndex: "level2LastName",
             key: "level2LastName",
             search: false,
           },
+          {
+            title: "Баталгаажуулагч нэр",
+            dataIndex: "level2FirstName",
+            key: "level2FirstName",
+            search: false,
+          },
+
           {
             title: "Тоолсон",
             dataIndex: "level1Total",

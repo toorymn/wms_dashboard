@@ -12,8 +12,6 @@ export interface LoginResponse {
   account: Account
 }
 
-
-
 const authTokenKey =  'app.token'
 const refreshToken = "refresh.token";
 

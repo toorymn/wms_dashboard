@@ -1,8 +1,8 @@
 import { PageContainer, ProDescriptions } from "@ant-design/pro-components";
 import CountInternalJournalTab from "./InternalJournal";
 import { ExclamationCircleOutlined, SendOutlined } from "@ant-design/icons";
-import { FC, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { FC, useState, useEffect, useCallback } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import WareHouseJournalTab from "./WarehouseJournal";
 import WareHouseZoneAssignmentTab from "./ZoneAssigment";
 import ZoneOverViewTab from "./ZoneOverview";
@@ -14,8 +14,35 @@ import { COUNT_STATUS, COUNT_STATUS_LABEL } from "@/utils/const";
 type TabKey = "internal" | "warehouse" | "zone-assignment" | "zone-overview";
 const CountDetailPage = () => {
   const { id } = useParams();
-  const [tab, setTab] = useState<TabKey>("internal");
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get tab from URL query parameter, default to "internal"
+  const getTabFromUrl = useCallback((): TabKey => {
+    const tabParam = searchParams.get("tab") as TabKey;
+    const validTabs: TabKey[] = [
+      "internal",
+      "warehouse",
+      "zone-assignment",
+      "zone-overview",
+    ];
+    return validTabs.includes(tabParam) ? tabParam : "internal";
+  }, [searchParams]);
+
+  const [tab, setTab] = useState<TabKey>(getTabFromUrl());
+
+  // Update tab state when URL changes
+  useEffect(() => {
+    setTab(getTabFromUrl());
+  }, [getTabFromUrl]);
+
+  // Function to update tab and URL
+  const handleTabChange = (newTab: TabKey) => {
+    setTab(newTab);
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("tab", newTab);
+    setSearchParams(newSearchParams);
+  };
 
   const [modal, contextHolder] = Modal.useModal();
 
@@ -115,8 +142,8 @@ const CountDetailPage = () => {
           key: "zone-overview",
         },
       ]}
-      onTabChange={(tab) => {
-        setTab(tab as TabKey);
+      onTabChange={(newTab) => {
+        handleTabChange(newTab as TabKey);
       }}
       footer={[
         tab == "warehouse" &&
@@ -128,13 +155,7 @@ const CountDetailPage = () => {
                   modal.confirm({
                     title: "Confirm",
                     icon: <ExclamationCircleOutlined />,
-                    content: (
-                      <Flex>
-                        {" "}
-                        "Тооллогыг цуцлах гэж байна CounterSubmitProgress
-                        <CounterSubmitProgress id={countId} />
-                      </Flex>
-                    ),
+                    content: <Flex>Тооллогыг цуцлах гэж байна</Flex>,
                     okText: "Итгэлтэй байна",
                     onOk: async () => {
                       await cancelCount.runAsync(countId);

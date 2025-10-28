@@ -29,6 +29,8 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
   return (
     <DrawerForm<{
       id: string;
+      batchName: string;
+      name: string;
       showQuantity: boolean;
     }>
       loading={journals.loading || create.loading}
@@ -42,6 +44,7 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
       drawerProps={{
         onClose: onFinish,
         destroyOnClose: true,
+        maskClosable: false,
       }}
       onFinish={async (values) => {
         const selectedJournal = journals.data?.records.find(
@@ -55,8 +58,9 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
         if (
           await create.runAsync({
             id: values.id,
-            batchName: selectedJournal?.name,
+            name: values.name,
             wareHouseLocationCode: selectedJournal?.locationCode,
+            batchName: selectedJournal.name,
             showQuantity: values.showQuantity,
           })
         ) {
@@ -67,13 +71,25 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
       }}
     >
       <ProForm.Group>
+        <ProFormText
+          width="md"
+          label="Тооллогын нэр"
+          name="name"
+          placeholder="Тооллогын нэрийг оруулна уу"
+          rules={[{ required: true, message: "Тооллогын нэрийг оруулна уу" }]}
+          required
+        />
+
         <ProFormSelect
           width="md"
-          label="Тооллогын дугаар"
+          label="Batch дугаар"
           options={journals.data?.records.map((r) => ({
             value: r.id,
             label: r.name,
           }))}
+          fieldProps={{
+            loading: journals.loading,
+          }}
           onChange={(__, option) => {
             const selectedJournal = journals.data?.records.find(
               (r) => r.id === (option as { value: string }).value
@@ -84,14 +100,14 @@ export const CreateNewCount: FC<Props> = ({ onFinish }) => {
             );
           }}
           name="id"
-          tooltip="Count number"
+          tooltip="Batch number"
           rules={[{ required: true, message: "Please  enter " }]}
           required
         />
 
         <ProFormText
           width="md"
-          label="Байршлын нэр"
+          label="Агуулах"
           name="wareHouseLocationCode"
           fieldProps={{ readOnly: true }}
         />

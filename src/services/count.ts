@@ -115,6 +115,7 @@ export interface Create {
 
 export interface CreateCountParams {
   id: string;
+  name: string;
   batchName: string;
   wareHouseLocationCode: string;
   showQuantity: boolean;

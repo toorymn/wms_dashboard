@@ -1,5 +1,5 @@
+import { useAuthContext } from "@/context/auth";
 import { WorkerService } from "@/services";
-import ReferenceService from "@/services/ref";
 import { CreateWorkerParams } from "@/services/worker";
 import {
   DrawerForm,
@@ -24,15 +24,12 @@ export const CreateWorkerAccount: FC<Props> = ({ onFinish }) => {
     onError: (err) => message.error(err.message),
   });
 
-  const warehouseFetch = useRequest(ReferenceService.warehouses, {
-    // manual: true,
-    onError: (err) => message.error(err.message),
-  });
+  const { user } = useAuthContext();
+
   return (
     <DrawerForm<CreateWorkerParams>
       open
-      // width={"100%"}
-      title="Шинэ ажилтан нэмэх"
+      title="Шинэ ажилтан үүсгэх"
       form={form}
       autoFocusFirstInput
       drawerProps={{
@@ -46,6 +43,7 @@ export const CreateWorkerAccount: FC<Props> = ({ onFinish }) => {
             firstName: values.firstName,
             username: values.username,
             password: values.password,
+            role: values.role,
             warehouse: values.warehouse,
           })
         ) {
@@ -74,23 +72,21 @@ export const CreateWorkerAccount: FC<Props> = ({ onFinish }) => {
           name="lastName"
           placeholder="Овог"
         />
-
         <ProFormText
           width="md"
           label="Нэвтрэх нэр"
           required
           name="username"
-          rules={[{ required: true, message: "Please enter", len: 6 }]}
+          rules={[{ required: true, message: "Please enter", min: 6 }]}
           tooltip="username"
           placeholder="Username"
         />
-
         <ProFormText.Password
           width="md"
           label="Нууц үг"
           required
           name="password"
-          rules={[{ required: true, message: "Please enter", len: 6 }]}
+          rules={[{ required: true, message: "Please enter", min: 6 }]}
           tooltip="password"
           placeholder="password"
         />
@@ -100,14 +96,35 @@ export const CreateWorkerAccount: FC<Props> = ({ onFinish }) => {
           mode="multiple"
           width={"md"}
           name="warehouse"
-          options={warehouseFetch.data?.map((w) => ({
-            label: `(${w.code})`,
-            value: w.code,
+          options={user?.managerWarehouses.map((wh) => ({
+            label: wh,
+            value: wh,
           }))}
           label="Агуулах"
           placeholder="Please select"
           rules={[{ required: true, message: "Please select!" }]}
         />
+
+        {user?.role === 100 && (
+          <ProFormSelect
+            mode="single"
+            width={"md"}
+            name="role"
+            options={[
+              {
+                label: "Агуулах ажилтан",
+                value: 200,
+              },
+              {
+                label: "Салбарын менежер",
+                value: 110,
+              },
+            ]}
+            label="Үүрэг"
+            placeholder="Please select"
+            rules={[{ required: true, message: "Please select!" }]}
+          />
+        )}
       </ProForm.Group>
     </DrawerForm>
   );
