@@ -83,6 +83,7 @@ export interface WareHouseCountJournalItemReport {
   targetSum: number;
   description: string;
   unitOfMeasureCode: string;
+  secondLevelBinCodes?: string[];
   total: number | null;
 }
 

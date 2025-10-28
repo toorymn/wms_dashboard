@@ -158,7 +158,7 @@ const CountDetailPage = () => {
                     },
                     content: (
                       <Flex dir="column">
-                        Тооллогыг илгээх гэж байна итгэлтэй байна 22
+                        Тооллогыг илгээх гэж байна итгэлтэй байна
                         <CounterSubmitProgress id={countId} />
                       </Flex>
                     ),

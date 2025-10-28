@@ -1,5 +1,5 @@
 import type { ActionType } from "@ant-design/pro-components";
-import { EyeOutlined } from "@ant-design/icons";
+import { DownloadOutlined, EyeOutlined } from "@ant-design/icons";
 import { ProCard, ProFormInstance, ProTable } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
 import { Button, Card, Col, Row, Statistic, Tag, Tooltip, message } from "antd";
@@ -12,6 +12,7 @@ import ShipmentService, {
 import { Link } from "react-router-dom";
 import ReferenceService from "@/services/ref";
 import { cubageConverter } from "@/utils/const";
+import * as XLSX from "xlsx";
 
 const machine1 = 8; //8m3/
 const machine2 = 16; //16m3
@@ -22,6 +23,11 @@ const ShipmentHistoryPage: FC<{
   const actionRef = useRef<ActionType>();
 
   const fetch = useRequest(ShipmentService.shipmentOrders, {
+    manual: true,
+    onError: (err) => message.error(err.message),
+  });
+
+  const download = useRequest(ShipmentService.shipmentDownload, {
     manual: true,
     onError: (err) => message.error(err.message),
   });
@@ -238,16 +244,88 @@ const ShipmentHistoryPage: FC<{
         dateFormatter="string"
         headerTitle="Shipment жагсаллт"
         toolBarRender={() => [
-          // <Button
-          //   key="button"
-          //   icon={<PlusOutlined />}
-          //   onClick={() => {
-          //     setShowCreate(true);
-          //   }}
-          //   type="primary"
-          // >
-          //   Ажилтан нэмэх
-          // </Button>,
+          <Button
+            loading={download.loading}
+            key="button"
+            type="dashed"
+            icon={<DownloadOutlined />}
+            onClick={async () => {
+              const tableFilters = ref.current?.getFieldsValue();
+
+              const data = await download.runAsync({
+                ...tableFilters,
+                date: date.toDate(),
+                limit: 0,
+                offset: 0,
+              });
+
+              if (data && data.length > 0) {
+                // Prepare data for Excel export
+                const worksheetData: unknown[][] = [
+                  // Headers
+                  [
+                    "№",
+                    "Destination No",
+                    "Item No",
+                    "Name",
+                    "Quantity",
+                    "Cubage",
+                    "PlaceBin",
+                  ],
+                  // Data rows
+                  ...data.map((record, idx) => [
+                    idx + 1,
+                    record.destinationNo,
+                    record.itemNo,
+                    record.name,
+                    record.shipmentQty,
+                    cubageConverter(record.cubage),
+                    record.placeBin,
+                  ]),
+                ];
+
+                // Create workbook and worksheet
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+                // Set column widths for better display
+                const columnWidths = [
+                  { wch: 5 }, // №
+                  { wch: 12 }, // Салбар
+                  { wch: 25 }, // Салбарын нэр
+                  { wch: 12 }, // Агуулах
+                  { wch: 12 }, // Тоо ширхэг
+                  { wch: 15 }, // Эзлэхүүн
+                  { wch: 15 }, // Байршил
+                ];
+                worksheet["!cols"] = columnWidths;
+
+                // Format destination code as text to preserve leading zeros
+                const range = XLSX.utils.decode_range(worksheet["!ref"]!);
+                for (let row = 1; row <= range.e.r; row++) {
+                  const cellAddress = XLSX.utils.encode_cell({ r: row, c: 1 }); // Column B (Салбар)
+                  if (worksheet[cellAddress]) {
+                    worksheet[cellAddress].t = "s"; // Set cell type to string
+                  }
+                }
+
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(
+                  workbook,
+                  worksheet,
+                  "Shipment History"
+                );
+
+                // Generate and download Excel file
+                const fileName = `shipment_history_${date.format(
+                  "YYYY-MM-DD"
+                )}.xlsx`;
+                XLSX.writeFile(workbook, fileName);
+              } else {
+                message.warning("Татах өгөгдөл байхгүй байна");
+              }
+            }}
+          />,
         ]}
       />
 

@@ -54,6 +54,16 @@ export interface ShipmentGateReport {
   cbm: number;
 }
 
+export interface ShipmentDestinationItem {
+  locationCode: string;
+  destinationNo: string;
+  name: string;
+  itemNo: string
+  shipmentQty: number;
+  cubage: number;
+  placeBin: string;
+}
+
 export interface ShipmentReport {
   gate: string;
   cbm: number;
@@ -82,6 +92,12 @@ const ShipmentService = {
       hasAuth: true,
       body,
     }),
+  shipmentDownload: (body: GetShipmentOrders) =>
+    Api.post<ShipmentDestinationItem[]>("/admin/shipment/download", {
+      hasAuth: true,
+      body,
+    }),
+
   preShipmentOrders: (body: GetPreShipmentOrders) =>
     Api.post<ListResponse<PreShipmentOrder>>("/admin/pre-shipment/list", {
       hasAuth: true,
