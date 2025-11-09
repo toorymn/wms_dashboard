@@ -271,7 +271,7 @@ const WareHouseJournalTab: FC<Props> = ({ countId }) => {
                       record.targetSum,
                       record.total ?? "-",
                       diff,
-                      record.secondLevelBinCodes?.join(","),
+                      record.secondLevelZones?.join(","),
                     ];
                   }),
                 ];
