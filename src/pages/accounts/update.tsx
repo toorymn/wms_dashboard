@@ -131,7 +131,7 @@ export const UpdateWorkerAccount: FC<Props> = ({ data, onFinish }) => {
                 value: 200,
               },
               {
-                label: "Салбарын менежер",
+                label: "Менежер",
                 value: 110,
               },
             ]}

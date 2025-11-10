@@ -72,7 +72,7 @@ const MainLayout: React.FC<{ children?: React.ReactNode }> = (props) => {
             user?.lastName?.at(0)?.toUpperCase() +
             "." +
             user?.firstName +
-            (user?.role == 100 ? " (Админ)" : "(Салбарын менежер)"),
+            (user?.role == 100 ? " (Админ)" : "(Менежер)"),
           render: (__, dom) => {
             return (
               <Dropdown

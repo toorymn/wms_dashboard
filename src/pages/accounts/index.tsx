@@ -69,7 +69,7 @@ const WorkersPage = () => {
             fieldProps: {
               options: [
                 {
-                  label: "Салбарын менежер",
+                  label: "Менежер",
                   value: 110,
                 },
                 {
@@ -80,7 +80,7 @@ const WorkersPage = () => {
             },
             render: (_, record) => {
               const roleMap = {
-                110: "Салбарын менежер",
+                110: "Менежер",
                 200: "Ажилтан",
               };
               return (
