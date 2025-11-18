@@ -1,6 +1,9 @@
 # Multi-stage build for production
 FROM node:18-alpine AS builder
 
+# Build argument for API URL
+ARG VITE_API_URL
+
 # Set working directory
 WORKDIR /app
 
@@ -17,7 +20,8 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application with environment variable
+ENV VITE_API_URL=$VITE_API_URL
 RUN pnpm run build
 
 # Production stage
