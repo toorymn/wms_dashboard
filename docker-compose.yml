@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  wms-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - wms-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wms-admin.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.wms-admin.entrypoints=websecure"
+      - "traefik.http.routers.wms-admin.tls.certresolver=letsencrypt"
+
+networks:
+  wms-network:
+    driver: bridge
+
+# Optional: For development
+# Uncomment the following if you need a development setup
+# services:
+#   wms-admin-dev:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile.dev
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - .:/app
+#       - /app/node_modules
+#     environment:
+#       - NODE_ENV=development
+#     networks:
+#       - wms-network
