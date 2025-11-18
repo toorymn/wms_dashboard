@@ -8,7 +8,7 @@
 docker build -t wms-admin .
 
 # Run the container
-docker run -p 80:80 wms-admin
+docker run -p 8080:8080 wms-admin
 ```
 
 ### Using Docker Compose
@@ -44,8 +44,9 @@ docker-compose down
    ```
 
 4. **Port Configuration:**
-   - Container Port: 80
-   - Public Port: 80 (or your preferred port)
+   - Container Port: 8080
+   - Public Port: 8080 (or your preferred port)
+   - Note: Avoid port 3000 as it may conflict with Dockploy dashboard
 
 5. **Deploy:**
    - Click "Deploy" in Dockploy
@@ -59,6 +60,8 @@ docker-compose down
 
 ### Health Check
 The container includes a health check endpoint at `/health` that returns "healthy" when the application is running properly.
+
+Access it at: `http://your-server:8080/health`
 
 ### Monitoring
 - Check container logs in Dockploy dashboard
