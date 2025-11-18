@@ -96,7 +96,7 @@ const MainLayout: React.FC<{ children?: React.ReactNode }> = (props) => {
         }}
         headerTitleRender={(logo, title, _) => {
           const defaultDom = (
-            <a>
+            <a style={{ marginLeft: "40px" }}>
               {logo}
               {title}
             </a>
