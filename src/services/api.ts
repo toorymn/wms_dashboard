@@ -5,6 +5,7 @@ import { BaseResponse } from "./types/base";
 
 const baseURL = import.meta.env.VITE_API_URL;
 console.log(baseURL);
+console.log({ env: import.meta.env });
 
 type AnyRecord<T extends string | number | symbol = string> = Record<T, any>;
 
